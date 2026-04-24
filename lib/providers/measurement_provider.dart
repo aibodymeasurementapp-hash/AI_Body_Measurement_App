@@ -1,55 +1,57 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/measurement_service.dart';
-import '../services/recommendation_service.dart';
+import '../services/size_recommendation_service.dart';
 import '../models/measurement.dart';
 import '../models/dress.dart';
+import '../models/pose.dart';
+import '../models/user_profile.dart';
+import '../services/measurement_calculator.dart';
+import '../data/men_dresses.dart';
 
 final measurementServiceProvider = Provider<MeasurementService>(
-  (ref) => MeasurementService(),
-);
-
-final recommendationServiceProvider = Provider<RecommendationService>(
-  (ref) => RecommendationService(),
+      (ref) => MeasurementService(),
 );
 
 final measurementStateProvider =
-    StateNotifierProvider<MeasurementStateNotifier, MeasurementState>((ref) {
-      return MeasurementStateNotifier(ref.read(measurementServiceProvider));
-    });
+StateNotifierProvider<MeasurementStateNotifier, MeasurementState>((ref) {
+  return MeasurementStateNotifier(ref.read(measurementServiceProvider));
+});
 
 final recommendationProvider =
-    FutureProvider.family<List<Dress>, Map<String, dynamic>>((ref, params) {
-      final service = ref.read(recommendationServiceProvider);
-      return service.getRecommendedDresses(
-        params['category'] as DressCategory,
-        params['dressType'] as DressType,
-        params['measurements'] as MeasurementResult,
-      );
-    });
+Provider.family<List<Dress>, MeasurementResult>((ref, measurement) {
+  return SizeRecommendationService.recommendedDresses(measurement, menDresses);
+});
 
 class MeasurementStateNotifier extends StateNotifier<MeasurementState> {
   final MeasurementService _measurementService;
 
   MeasurementStateNotifier(this._measurementService)
-    : super(const MeasurementState.initial());
+      : super(const MeasurementState.initial());
 
   Future<void> processManualMeasurements(Measurement measurement) async {
     state = const MeasurementState.loading();
     try {
-      final result = await _measurementService.processManualMeasurements(
-        measurement,
-      );
+      final result =
+      await _measurementService.processManualMeasurements(measurement);
       state = MeasurementState.success(result);
     } catch (e) {
       state = MeasurementState.error(e.toString());
     }
   }
 
-  Future<void> processCameraMeasurements(String imagePath) async {
+  Future<void> processCameraMeasurements(
+      String imagePath,
+      double userHeightCm, {
+        UserProfile? userProfile,
+        double gyroCorrectionFactor = 1.0,
+      }) async {
     state = const MeasurementState.loading();
     try {
       final result = await _measurementService.processCameraMeasurements(
         imagePath,
+        userHeightCm,
+        userProfile:          userProfile,
+        gyroCorrectionFactor: gyroCorrectionFactor,
       );
       state = MeasurementState.success(result);
     } catch (e) {
@@ -57,9 +59,27 @@ class MeasurementStateNotifier extends StateNotifier<MeasurementState> {
     }
   }
 
-  void reset() {
-    state = const MeasurementState.initial();
+  Future<void> processPoseMeasurements(
+      Pose pose, {
+        double userHeightCm = 170.0,
+        UserProfile? userProfile,
+        double gyroCorrectionFactor = 1.0,
+      }) async {
+    state = const MeasurementState.loading();
+    try {
+      final result = MeasurementCalculator.calculate(
+        pose,
+        userHeightCm:         userHeightCm,
+        userProfile:          userProfile,
+        gyroCorrectionFactor: gyroCorrectionFactor,
+      );
+      state = MeasurementState.success(result);
+    } catch (e) {
+      state = MeasurementState.error(e.toString());
+    }
   }
+
+  void reset() => state = const MeasurementState.initial();
 }
 
 class MeasurementState {
@@ -67,18 +87,14 @@ class MeasurementState {
   final MeasurementResult? result;
   final String? error;
 
-  // ✅ FIX: initialize ALL final fields (result + error also)
   const MeasurementState._({required this.isLoading, this.result, this.error});
 
   const MeasurementState.initial()
-    : this._(isLoading: false, result: null, error: null);
-
+      : this._(isLoading: false, result: null, error: null);
   const MeasurementState.loading()
-    : this._(isLoading: true, result: null, error: null);
-
-  const MeasurementState.success(MeasurementResult result)
-    : this._(isLoading: false, result: result, error: null);
-
-  const MeasurementState.error(String error)
-    : this._(isLoading: false, result: null, error: error);
+      : this._(isLoading: true, result: null, error: null);
+  const MeasurementState.success(MeasurementResult r)
+      : this._(isLoading: false, result: r, error: null);
+  const MeasurementState.error(String e)
+      : this._(isLoading: false, result: null, error: e);
 }

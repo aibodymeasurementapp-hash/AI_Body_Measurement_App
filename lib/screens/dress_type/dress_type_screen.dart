@@ -11,7 +11,7 @@ class DressTypeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(appStateProvider);
+    final appState     = ref.watch(appStateProvider);
     final categoryName = appState.selectedCategory?.name.toUpperCase() ?? '';
 
     return Scaffold(
@@ -24,7 +24,7 @@ class DressTypeScreen extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            
+
             Text(
               'Select Dress Type for $categoryName',
               style: const TextStyle(
@@ -33,9 +33,9 @@ class DressTypeScreen extends ConsumerWidget {
                 color: AppColors.textPrimary,
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             const Text(
               'Choose the type of dress you want to measure',
               style: TextStyle(
@@ -43,33 +43,39 @@ class DressTypeScreen extends ConsumerWidget {
                 color: AppColors.textSecondary,
               ),
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             Expanded(
               child: Column(
                 children: [
+
                   _DressTypeCard(
                     title: 'Pant Shirt',
                     subtitle: 'Western style clothing',
                     icon: Icons.checkroom,
                     onTap: () {
-                      ref.read(appStateProvider.notifier).setSelectedDressType(DressType.pantShirt);
+                      ref
+                          .read(appStateProvider.notifier)
+                          .setSelectedDressType(DressType.pantShirt);
                       context.goNamed('manual-measurement');
                     },
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   _DressTypeCard(
                     title: 'Shalwar Qameez',
                     subtitle: 'Traditional style clothing',
                     icon: Icons.accessibility,
                     onTap: () {
-                      ref.read(appStateProvider.notifier).setSelectedDressType(DressType.shalwarQameez);
+                      ref
+                          .read(appStateProvider.notifier)
+                          .setSelectedDressType(DressType.shalwarQameez);
                       context.goNamed('manual-measurement');
                     },
                   ),
+
                 ],
               ),
             ),
@@ -81,9 +87,9 @@ class DressTypeScreen extends ConsumerWidget {
 }
 
 class _DressTypeCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
+  final String      title;
+  final String      subtitle;
+  final IconData    icon;
   final VoidCallback onTap;
 
   const _DressTypeCard({
@@ -114,22 +120,20 @@ class _DressTypeCard extends StatelessWidget {
           ),
           child: Row(
             children: [
+
               Container(
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+                  borderRadius:
+                  BorderRadius.circular(AppSpacing.radiusMedium),
                 ),
-                child: Icon(
-                  icon,
-                  color: Colors.white,
-                  size: 28,
-                ),
+                child: Icon(icon, color: Colors.white, size: 28),
               ),
-              
+
               const SizedBox(width: 20),
-              
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,12 +157,13 @@ class _DressTypeCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const Icon(
                 Icons.arrow_forward_ios,
                 color: AppColors.primary,
                 size: 20,
               ),
+
             ],
           ),
         ),

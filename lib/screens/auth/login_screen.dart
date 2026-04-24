@@ -5,6 +5,8 @@ import '../../constants/app_constants.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/app_state_provider.dart';
+
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -41,14 +43,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     // Navigate on successful authentication
     ref.listen(authStateProvider, (previous, next) {
       if (next.isAuthenticated && !next.isLoading) {
+        ref.read(appStateProvider.notifier).setUserProfile(next.user!);
         context.goNamed('category');
       }
     });
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.paddingLarge),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.paddingLarge,
+              vertical: 24,
+            ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -173,12 +180,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ],
-                ),
+                ) ,
+                const SizedBox(height: 24),
               ],
             ),
           ),
         ),
       ),
-    );
+      ),
+      );
   }
 }

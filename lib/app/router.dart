@@ -9,6 +9,7 @@ import '../screens/measurements/manual_measurement_screen.dart';
 import '../screens/measurements/camera_measurement_screen.dart';
 import '../screens/measurements/result_display_screen.dart';
 import '../screens/recommendations/recommended_dresses_screen.dart';
+import '../screens/measurements/live_camera_screen.dart';
 // import '../screens/recommendations/dress_detail_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -44,6 +45,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/camera-measurement',
         name: 'camera-measurement',
         builder: (context, state) => const CameraMeasurementScreen(),
+      ),
+      GoRoute(
+        path: '/live-camera',
+        name: 'live-camera',
+        builder: (context, state) => const LiveCameraScreen(),
       ),
       GoRoute(
         path: '/result',

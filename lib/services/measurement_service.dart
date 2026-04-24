@@ -1,45 +1,73 @@
 import '../models/measurement.dart';
+import '../models/pose.dart';
+import '../models/user_profile.dart';
+import '../providers/pose_provider.dart';
+import 'measurement_calculator.dart';
 
 class MeasurementService {
+
   Future<void> _simulateProcessing() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
   }
 
-  Future<MeasurementResult> processManualMeasurements(Measurement measurement) async {
+  // ── Manual measurements ────────────────────────────────────────────────
+  // Direct 1-to-1 mapping — no camera, no gyro needed.
+  Future<MeasurementResult> processManualMeasurements(
+      Measurement measurement,
+      ) async {
     await _simulateProcessing();
 
-    // Mock calculation - convert manual measurements to result format
     return MeasurementResult(
-      id: 'result_${DateTime.now().millisecondsSinceEpoch}',
-      shoulderWidth: measurement.shoulder,
-      chest: measurement.chest,
-      waist: measurement.waist,
-      hip: measurement.hip,
-      leftArmLength: measurement.sleevesLength,
-      rightArmLength: measurement.sleevesLength,
-      leftLegLength: measurement.inseam,
-      rightLegLength: measurement.inseam,
-      height: measurement.shirtLength * 3, // Mock calculation
-      createdAt: DateTime.now(),
+      id:              'result_${DateTime.now().millisecondsSinceEpoch}',
+      height:          measurement.height,
+      shoulderWidth:   measurement.shoulder,
+      chest:           measurement.chest,
+      waist:           measurement.waist,
+      hip:             measurement.hip,
+      upperBodyLength: measurement.shirtLength,
+      lowerBodyLength: measurement.inseam,
+      leftArmLength:   measurement.sleevesLength,
+      rightArmLength:  measurement.sleevesLength,
+      leftLegLength:   measurement.inseam,
+      rightLegLength:  measurement.inseam,
+      createdAt:       DateTime.now(),
     );
   }
 
-  Future<MeasurementResult> processCameraMeasurements(String imagePath) async {
+  // ── Camera AI measurements ─────────────────────────────────────────────
+  //
+  // [imagePath]            — path to the captured photo
+  // [userHeightCm]         — from UserProfile, sets the pixel→cm scale
+  // [userProfile]          — optional; drives BMI-based depth estimation.
+  //                          Pass null to use defaults (average build, age 28).
+  // [gyroCorrectionFactor] — cos(tiltAngle) from GyroService at capture time.
+  //                          1.0 = no tilt (default / fallback).
+  Future<MeasurementResult> processCameraMeasurements(
+      String imagePath,
+      double userHeightCm, {
+        UserProfile? userProfile,          // ← NEW
+        double gyroCorrectionFactor = 1.0, // ← NEW
+      }) async {
     await _simulateProcessing();
 
-    // Mock AI processing - in real app, this would use ML models
-    return MeasurementResult(
-      id: 'result_${DateTime.now().millisecondsSinceEpoch}',
-      shoulderWidth: 42.5,
-      chest: 96.0,
-      waist: 82.0,
-      hip: 94.0,
-      leftArmLength: 61.0,
-      rightArmLength: 61.5,
-      leftLegLength: 102.0,
-      rightLegLength: 102.5,
-      height: 175.0,
-      createdAt: DateTime.now(),
+    final Pose? pose = PoseNotifier.lastPose;
+
+    if (pose == null) {
+      throw Exception(
+          "Pose not detected. Please retake the photo.");
+    }
+
+    if (!pose.hasValidKeypoints()) {
+      throw Exception(
+          "Some keypoints are not clear. "
+              "Please retake the photo with proper pose.");
+    }
+
+    return MeasurementCalculator.calculate(
+      pose,
+      userHeightCm:          userHeightCm,
+      userProfile:           userProfile,          // ← passed through
+      gyroCorrectionFactor:  gyroCorrectionFactor, // ← passed through
     );
   }
 }

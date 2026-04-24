@@ -46,9 +46,9 @@ class CategorySelectionScreen extends ConsumerWidget {
             Expanded(
               child: GridView.count(
                 crossAxisCount: 1,
-                childAspectRatio: 2.5,
+                childAspectRatio: 4.5,
                 crossAxisSpacing: 16,
-                mainAxisSpacing: 20,
+                mainAxisSpacing: 24,
                 children: [
                   _CategoryCard(
                     title: 'MEN',
@@ -97,18 +97,34 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Responsive sizes (all based on screen width)
+    final titleFontSize = screenWidth * 0.09;         // ≈32–42 px, big & bold
+    final badgeFontSize = screenWidth * 0.04;         // ≈14–18 px
+    final cardPaddingHorizontal = screenWidth * 0.05; // ≈18–25 px
+    final cardPaddingVertical = screenWidth * 0.03;   // ≈11–16 px
+    final imageWidth = screenWidth * 0.38;            // ≈130–160 px, responsive
+    final badgePaddingHorizontal = screenWidth * 0.05;
+    final badgePaddingVertical = screenWidth * 0.025;
+
+    print('Trying to load image for $title: $imageUrl');
+
     return GestureDetector(
       onTap: onTap,
       child: Card(
         elevation: 8,
         shadowColor: Colors.black26,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),  // softer, modern corners
+        ),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+            borderRadius: BorderRadius.circular(24),
             gradient: LinearGradient(
               colors: [
-                AppColors.primary.withOpacity(0.1),
-                AppColors.primaryLight.withOpacity(0.05),
+                AppColors.primary.withOpacity(0.12),
+                AppColors.primaryLight.withOpacity(0.06),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -116,16 +132,16 @@ class _CategoryCard extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Background Image
+              // Right-side image (responsive width)
               Positioned(
                 right: 0,
                 top: 0,
                 bottom: 0,
-                width: 120,
+                width: imageWidth,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(AppSpacing.radiusLarge),
-                    bottomRight: Radius.circular(AppSpacing.radiusLarge),
+                    topRight: Radius.circular(24),
+                    bottomRight: Radius.circular(24),
                   ),
                   child: Image.network(
                     imageUrl,
@@ -133,9 +149,10 @@ class _CategoryCard extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         color: AppColors.border,
-                        child: const Icon(
+                        alignment: Alignment.center,
+                        child: Icon(
                           Icons.person,
-                          size: 40,
+                          size: screenWidth * 0.10,  // ≈36–50 px
                           color: AppColors.textSecondary,
                         ),
                       );
@@ -143,43 +160,63 @@ class _CategoryCard extends StatelessWidget {
                   ),
                 ),
               ),
-              
-              // Content
+
+              // Left-side content (text + badge)
               Positioned.fill(
                 child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.paddingLarge),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Select',
+                  padding: EdgeInsets.symmetric(
+                    horizontal: cardPaddingHorizontal,
+                    vertical: cardPaddingVertical,
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
                           style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textPrimary,
+                            letterSpacing: 1.0,
+                            height: 1.1,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: cardPaddingVertical * 0.6),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: badgePaddingHorizontal,
+                            vertical: badgePaddingVertical,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.primary.withOpacity(0.35),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'Select',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: badgeFontSize,
+                              letterSpacing: 0.8,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
