@@ -7,7 +7,24 @@ import '../../widgets/primary_button.dart';
 import '../../providers/app_state_provider.dart';
 
 class ResultDisplayScreen extends ConsumerWidget {
-  const ResultDisplayScreen({super.key});
+  final String source;
+
+  const ResultDisplayScreen({
+    super.key,
+    required this.source,
+  });
+
+  String get _backRoute {
+    switch (source) {
+      case 'gallery':
+        return 'camera-measurement';
+      case 'camera':
+        return 'live-camera';
+      case 'manual':
+      default:
+        return 'manual-measurement';
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -15,13 +32,19 @@ class ResultDisplayScreen extends ConsumerWidget {
 
     if (result == null) {
       return Scaffold(
-        appBar: const CustomAppBar(title: 'Results'),
+        appBar: CustomAppBar(
+          title: 'Results',
+          onBackPressed: () => context.goNamed(_backRoute),
+        ),
         body: const Center(child: Text('No measurement results available')),
       );
     }
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Measurement Results'),
+      appBar: CustomAppBar(
+        title: 'Measurement Results',
+        onBackPressed: () => context.goNamed(_backRoute),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppSpacing.paddingLarge),
         child: Column(
@@ -48,7 +71,6 @@ class ResultDisplayScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // ── Height ───────────────────────────────────────────
             _MeasurementSection(
               title: 'Height',
               icon: Icons.height,
@@ -59,7 +81,6 @@ class ResultDisplayScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // ── Upper body (clothing-relevant) ───────────────────
             _MeasurementSection(
               title: 'Upper Body',
               icon: Icons.accessibility_new,
@@ -67,13 +88,11 @@ class ResultDisplayScreen extends ConsumerWidget {
                 _MeasurementItem('Shoulder Width', result.shoulderWidth),
                 _MeasurementItem('Chest',          result.chest),
                 _MeasurementItem('Waist',          result.waist),
-                _MeasurementItem('Hip',            result.hip),
               ],
             ),
 
             const SizedBox(height: 16),
 
-            // ── Sleeve length ────────────────────────────────────
             _MeasurementSection(
               title: 'Sleeve Length',
               icon: Icons.open_in_full,
@@ -85,7 +104,6 @@ class ResultDisplayScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // ── Trouser/inseam length ────────────────────────────
             _MeasurementSection(
               title: 'Trouser Length',
               icon: Icons.straighten,
@@ -97,7 +115,6 @@ class ResultDisplayScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // ── Action buttons ───────────────────────────────────
             PrimaryButton(
               text: 'Save Result',
               onPressed: () {
@@ -121,7 +138,8 @@ class ResultDisplayScreen extends ConsumerWidget {
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.primary, width: 2),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+                    borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusLarge),
                   ),
                 ),
                 child: const Text(
@@ -141,7 +159,8 @@ class ResultDisplayScreen extends ConsumerWidget {
               onPressed: () => context.goNamed('category'),
               child: const Text(
                 'Back to Home',
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                style: TextStyle(
+                    color: AppColors.textSecondary, fontSize: 16),
               ),
             ),
 
@@ -155,8 +174,6 @@ class ResultDisplayScreen extends ConsumerWidget {
   String _formatDate(DateTime date) =>
       '${date.day}/${date.month}/${date.year}';
 }
-
-// ── Section widget ───────────────────────────────────────────────────────────
 
 class _MeasurementSection extends StatelessWidget {
   final String title;
@@ -176,8 +193,6 @@ class _MeasurementSection extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.paddingLarge),
         child: Column(
           children: [
-
-            // Section header
             Row(
               children: [
                 Container(
@@ -185,7 +200,8 @@ class _MeasurementSection extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius:
+                    BorderRadius.circular(AppSpacing.radiusSmall),
                   ),
                   child: Icon(icon, color: Colors.white, size: 20),
                 ),
@@ -200,17 +216,13 @@ class _MeasurementSection extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 16),
-
-            // Measurement rows
             ...measurements.map(
                   (m) => Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-
                     Text(
                       m.name,
                       style: const TextStyle(
@@ -218,8 +230,6 @@ class _MeasurementSection extends StatelessWidget {
                         color: AppColors.textPrimary,
                       ),
                     ),
-
-                    // Shows cm only — values already come in cm from calculator
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,

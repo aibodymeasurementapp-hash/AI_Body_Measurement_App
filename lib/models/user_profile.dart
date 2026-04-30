@@ -1,4 +1,6 @@
-import 'dart:math';
+enum Gender { male, female }
+
+enum BuildType { lean, average, heavy, obese }
 
 class UserProfile {
   final String id;
@@ -8,7 +10,8 @@ class UserProfile {
   final Gender gender;
   final double heightCm;
   final double weightKg;
-  final int age; // ← NEW: required for circumference depth estimation
+  final int age;
+  final BuildType buildType; // ← added
 
   UserProfile({
     required this.id,
@@ -18,53 +21,44 @@ class UserProfile {
     required this.gender,
     required this.heightCm,
     required this.weightKg,
-    required this.age, // ← NEW
+    required this.age,
+    this.buildType = BuildType.average, // ← optional, defaults to average
   });
 
-  // ── Derived helpers ──────────────────────────────────────────────
-
-  /// Body Mass Index
-  double get bmi => weightKg / pow(heightCm / 100.0, 2);
-
-  /// Build classification based on BMI — used in circumference estimation.
-  /// BMI is more reliable than age alone for depth ratios.
-  BuildType get buildType {
-    if (bmi < 18.5) return BuildType.lean;
-    if (bmi < 25.0) return BuildType.average;
-    if (bmi < 30.0) return BuildType.heavy;
-    return BuildType.obese;
-  }
-
-  UserProfile copyWith({
-    String? id,
-    String? fullName,
-    String? email,
-    String? phone,
-    Gender? gender,
-    double? heightCm,
-    double? weightKg,
-    int? age,
-  }) {
+  factory UserProfile.fromMap(Map<String, dynamic> map, String id) {
     return UserProfile(
-      id:        id        ?? this.id,
-      fullName:  fullName  ?? this.fullName,
-      email:     email     ?? this.email,
-      phone:     phone     ?? this.phone,
-      gender:    gender    ?? this.gender,
-      heightCm:  heightCm  ?? this.heightCm,
-      weightKg:  weightKg  ?? this.weightKg,
-      age:       age       ?? this.age,
+      id: id,
+      fullName: map['fullName'] ?? '',
+      email: map['email'] ?? '',
+      phone: map['phone'] ?? '',
+      gender: map['gender'] == 'female' ? Gender.female : Gender.male,
+      heightCm: (map['heightCm'] ?? 170).toDouble(),
+      weightKg: (map['weightKg'] ?? 0).toDouble(),
+      age: map['age'] ?? 25,
+      buildType: _buildTypeFromString(map['buildType']), // ← added
     );
   }
-}
 
-enum Gender { male, female, other }
+  Map<String, dynamic> toMap() {
+    return {
+      'fullName': fullName,
+      'email': email,
+      'phone': phone,
+      'gender': gender.name,
+      'heightCm': heightCm,
+      'weightKg': weightKg,
+      'age': age,
+      'buildType': buildType.name, // ← added
+    };
+  }
 
-/// Body build classification derived from BMI.
-/// Controls depth ratios in MeasurementCalculator.
-enum BuildType {
-  lean,    // BMI < 18.5  → shallow depth
-  average, // BMI 18.5–25 → normal depth
-  heavy,   // BMI 25–30   → deeper torso
-  obese,   // BMI ≥ 30    → significantly deeper torso
+  // ── Helper to safely parse buildType from Firestore string ──
+  static BuildType _buildTypeFromString(String? value) {
+    switch (value) {
+      case 'lean':    return BuildType.lean;
+      case 'heavy':   return BuildType.heavy;
+      case 'obese':   return BuildType.obese;
+      default:        return BuildType.average;
+    }
+  }
 }

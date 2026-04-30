@@ -27,22 +27,20 @@ class CameraMeasurementScreen extends ConsumerStatefulWidget {
 class _CameraMeasurementScreenState
     extends ConsumerState<CameraMeasurementScreen> {
 
-  File?  _selectedImage;
-  Size?  _imageSize;
-  final  ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+  Size? _imageSize;
+  final ImagePicker _picker = ImagePicker();
 
-  // Gyro factor recorded at shutter time.
-  // For gallery images (tilt unknown) we default to 1.0.
   double _capturedGyroFactor = 1.0;
-  String _capturedTiltInfo   = '';
+  String _capturedTiltInfo = '';
 
   final GyroService _gyro = GyroService();
+
+  bool _isDetectingPose = false;
 
   @override
   void initState() {
     super.initState();
-    // Warm up the sensor so a reading is ready by capture time.
-    // If sensor is unavailable this is a silent no-op.
     _gyro.startListening();
   }
 
@@ -54,7 +52,7 @@ class _CameraMeasurementScreenState
 
   // ── Image dimension helper ─────────────────────────────────────────────
   Future<void> _getImageDimensions(File file) async {
-    final bytes        = await file.readAsBytes();
+    final bytes = await file.readAsBytes();
     final decodedImage = await decodeImageFromList(bytes);
     if (mounted) {
       setState(() {
@@ -66,42 +64,7 @@ class _CameraMeasurementScreenState
     }
   }
 
-  // ── Open camera ────────────────────────────────────────────────────────
-  // Snapshot the gyro correction factor just before the shutter opens.
-  // The correction is recorded regardless of tilt severity — gyro NEVER
-  // prevents the user from taking a photo.
-
-  /*
-  Future<void> _openCamera() async {
-    try {
-      // Read gyro before the camera dialog takes focus (most accurate moment)
-      final double factor = _gyro.correctionFactor;
-      final String info   = _gyro.isGyroAvailable
-          ? "tilt ${_gyro.tiltAngleDeg.abs().toStringAsFixed(1)}°"
-          : "gyro unavailable";
-
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 85,
-      );
-      if (image == null) return;
-
-      final file = File(image.path);
-      setState(() {
-        _selectedImage      = file;
-        _capturedGyroFactor = factor;
-        _capturedTiltInfo   = info;
-      });
-
-      await _getImageDimensions(file);
-      await ref.read(poseProvider.notifier).detectPose(file.path);
-    } catch (e) {
-      _showError("Camera failed: $e");
-    }
-  }
-  */
   // ── Gallery selection ──────────────────────────────────────────────────
-  // Tilt at original capture time is unknown → use 1.0 (no correction).
   Future<void> _selectImage() async {
     try {
       final XFile? image = await _picker.pickImage(
@@ -111,31 +74,49 @@ class _CameraMeasurementScreenState
       if (image == null) return;
 
       final file = File(image.path);
+
       setState(() {
-        _selectedImage      = file;
+        _selectedImage = file;
         _capturedGyroFactor = 1.0;
-        _capturedTiltInfo   = 'gallery — no tilt data';
+        _capturedTiltInfo = 'gallery — no tilt data';
+        _isDetectingPose = true;
       });
 
       await _getImageDimensions(file);
+
+      // Detect pose and wait for it to fully complete
       await ref.read(poseProvider.notifier).detectPose(file.path);
+
+      // ✅ Use addPostFrameCallback so Riverpod pose state
+      // is fully propagated before we re-evaluate validPose
+      if (mounted) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {
+              _isDetectingPose = false;
+            });
+          }
+        });
+      }
     } catch (e) {
       _showError("Gallery selection failed: $e");
+      if (mounted) setState(() => _isDetectingPose = false);
     }
   }
 
   // ── Retake ─────────────────────────────────────────────────────────────
   void _retake() {
     setState(() {
-      _selectedImage      = null;
-      _imageSize          = null;
+      _selectedImage = null;
+      _imageSize = null;
       _capturedGyroFactor = 1.0;
-      _capturedTiltInfo   = '';
+      _capturedTiltInfo = '';
+      _isDetectingPose = false;
     });
     ref.read(poseProvider.notifier).clearPose();
   }
 
-  // ── Confirm — gated on pose validity only ──────────────────────────────
+  // ── Confirm ────────────────────────────────────────────────────────────
   Future<void> _confirm() async {
     if (_selectedImage == null) return;
 
@@ -151,16 +132,15 @@ class _CameraMeasurementScreenState
       return;
     }
 
-    final userProfile    = ref.read(appStateProvider).userProfile;
-    final double height  = userProfile?.heightCm ?? 170.0;
+    final userProfile = ref.read(appStateProvider).userProfile;
+    final double height = userProfile?.heightCm ?? 170.0;
 
-    await ref
-        .read(measurementStateProvider.notifier)
+    await ref.read(measurementStateProvider.notifier)
         .processCameraMeasurements(
       _selectedImage!.path,
       height,
-      userProfile:          userProfile,
-      gyroCorrectionFactor: _capturedGyroFactor, // applied as soft correction
+      userProfile: userProfile,
+      gyroCorrectionFactor: _capturedGyroFactor,
     );
   }
 
@@ -174,13 +154,17 @@ class _CameraMeasurementScreenState
   @override
   Widget build(BuildContext context) {
     final measurementState = ref.watch(measurementStateProvider);
-    final pose             = ref.watch(poseProvider);
+    final pose = ref.watch(poseProvider);
 
     final validation = pose != null
         ? PoseValidationService.validate(pose)
         : const PoseValidationResult.invalid("No pose detected");
 
     final bool validPose = validation.isValid;
+
+    // ✅ Only enable confirm when: not detecting, pose is valid, not already processing
+    final bool canConfirm =
+        !_isDetectingPose && validPose && !measurementState.isLoading;
 
     ref.listen(measurementStateProvider, (previous, next) {
       if (next.result != null && !next.isLoading) {
@@ -221,7 +205,6 @@ class _CameraMeasurementScreenState
 
             const SizedBox(height: 24),
 
-            // ── Image preview ──────────────────────────────────────────
             Expanded(
               child: Container(
                 width: double.infinity,
@@ -239,39 +222,50 @@ class _CameraMeasurementScreenState
 
             const SizedBox(height: 12),
 
-            // ── Pose status ────────────────────────────────────────────
+            // ── Status row ───────────────────────────────────────────────
             if (_selectedImage != null)
-              Text(
-                validPose
-                    ? "✅ Pose detected correctly"
-                    : validation.failureReason ?? "Adjust your position",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: validPose ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
+              Column(
+                children: [
+                  if (_isDetectingPose)
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 8),
+                        Text("Detecting pose..."),
+                      ],
+                    )
+                  else
+                    Text(
+                      validPose
+                          ? "✅ Pose detected correctly"
+                          : validation.failureReason ?? "Adjust your position",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: validPose ? Colors.green : Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ],
               ),
 
-            // ── Gyro tilt info (informational only) ────────────────────
             if (_selectedImage != null && _capturedTiltInfo.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: _TiltInfoChip(
-                  info:   _capturedTiltInfo,
+                  info: _capturedTiltInfo,
                   factor: _capturedGyroFactor,
                 ),
               ),
 
             const SizedBox(height: 20),
 
-            // ── Buttons ────────────────────────────────────────────────
+            // ── Buttons ──────────────────────────────────────────────────
             if (_selectedImage == null) ...[
-
-             // PrimaryButton(
-             //   text: "Open Camera",
-             //   onPressed: _openCamera,
-             // ),
-
               const SizedBox(height: 12),
 
               SizedBox(
@@ -279,21 +273,7 @@ class _CameraMeasurementScreenState
                 height: 52,
                 child: OutlinedButton(
                   onPressed: _selectImage,
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                        color: AppColors.primary, width: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusLarge),
-                    ),
-                  ),
-                  child: const Text(
-                    "Select from Gallery",
-                    style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
-                  ),
+                  child: const Text("Select from Gallery"),
                 ),
               ),
 
@@ -304,32 +284,20 @@ class _CameraMeasurementScreenState
                 height: 52,
                 child: OutlinedButton.icon(
                   onPressed: () => context.goNamed('live-camera'),
-                  icon: const Icon(Icons.videocam, color: AppColors.primary),
-                  label: const Text(
-                    'Use Live Camera',
-                    style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                        color: AppColors.primary, width: 2),
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusLarge),
-                    ),
-                  ),
+                  icon: const Icon(Icons.videocam),
+                  label: const Text('Use Live Camera'),
                 ),
               ),
 
             ] else ...[
-
               Row(
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _retake,
+                      // ✅ Disable retake while detecting or processing
+                      onPressed: (_isDetectingPose || measurementState.isLoading)
+                          ? null
+                          : _retake,
                       child: const Text("Retake"),
                     ),
                   ),
@@ -337,9 +305,9 @@ class _CameraMeasurementScreenState
                   Expanded(
                     child: PrimaryButton(
                       text: "Confirm",
-                      // Gated on pose only — gyro does NOT block this
-                      onPressed: validPose ? _confirm : null,
-                      isLoading: measurementState.isLoading,
+                      // ✅ Fixed: uses canConfirm which waits for pose state
+                      onPressed: canConfirm ? _confirm : null,
+                      isLoading: measurementState.isLoading || _isDetectingPose,
                     ),
                   ),
                 ],
@@ -371,8 +339,7 @@ class _CameraMeasurementScreenState
     return Stack(
       children: [
         ClipRRect(
-          borderRadius:
-          BorderRadius.circular(AppSpacing.radiusLarge),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           child: Image.file(
             _selectedImage!,
             width: double.infinity,
@@ -395,8 +362,6 @@ class _CameraMeasurementScreenState
   }
 }
 
-// ── Small tilt info chip shown below the image ─────────────────────────────
-
 class _TiltInfoChip extends StatelessWidget {
   final String info;
   final double factor;
@@ -405,12 +370,12 @@ class _TiltInfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // factor = 1.0 → no correction needed → neutral colour
     final Color bg = factor >= 0.985
         ? Colors.blueGrey.shade100
         : factor >= 0.940
         ? Colors.orange.shade100
         : Colors.red.shade100;
+
     final Color fg = factor >= 0.985
         ? Colors.blueGrey.shade700
         : factor >= 0.940

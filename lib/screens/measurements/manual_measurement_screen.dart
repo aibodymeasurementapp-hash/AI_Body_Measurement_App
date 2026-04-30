@@ -9,16 +9,14 @@ import '../../providers/measurement_provider.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/primary_button.dart';
+import '../payment/payment_screen.dart';
+import '../../services/firebase_service.dart';
 
-/// ─────────────────────────────────────────────────────────
-/// Measurement Keys (avoid raw strings everywhere)
-/// ─────────────────────────────────────────────────────────
 enum MeasurementField {
   height,
   shoulderWidth,
   chest,
   waist,
-  hip,
   sleeveLength,
   shirtLength,
   inseam,
@@ -35,8 +33,6 @@ extension MeasurementFieldX on MeasurementField {
         return 'Chest';
       case MeasurementField.waist:
         return 'Waist';
-      case MeasurementField.hip:
-        return 'Hip';
       case MeasurementField.sleeveLength:
         return 'Sleeve Length';
       case MeasurementField.shirtLength:
@@ -47,9 +43,6 @@ extension MeasurementFieldX on MeasurementField {
   }
 }
 
-/// ─────────────────────────────────────────────────────────
-/// Main Screen
-/// ─────────────────────────────────────────────────────────
 class ManualMeasurementScreen extends ConsumerStatefulWidget {
   const ManualMeasurementScreen({super.key});
 
@@ -72,7 +65,6 @@ class _ManualMeasurementScreenState
     MeasurementField.shoulderWidth: (0, 100),
     MeasurementField.chest: (0, 200),
     MeasurementField.waist: (0, 240),
-    MeasurementField.hip: (0, 200),
     MeasurementField.sleeveLength: (0, 100),
     MeasurementField.shirtLength: (0, 100),
     MeasurementField.inseam: (0, 100),
@@ -90,16 +82,10 @@ class _ManualMeasurementScreenState
       MeasurementField.shoulderWidth: 43,
       MeasurementField.chest: 96,
       MeasurementField.waist: 80,
-      MeasurementField.hip: 96,
       MeasurementField.sleeveLength: 60,
       MeasurementField.shirtLength: 70,
       MeasurementField.inseam: 76,
     };
-
-    /// ✅ Move listener OUT of build (professional practice)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.listen(measurementStateProvider, _handleStateChanges);
-    });
   }
 
   @override
@@ -138,7 +124,6 @@ class _ManualMeasurementScreenState
       shoulder: _values[MeasurementField.shoulderWidth]!,
       chest: _values[MeasurementField.chest]!,
       waist: _values[MeasurementField.waist]!,
-      hip: _values[MeasurementField.hip]!,
       sleevesLength: _values[MeasurementField.sleeveLength]!,
       shirtLength: _values[MeasurementField.shirtLength]!,
       inseam: _values[MeasurementField.inseam]!,
@@ -156,6 +141,8 @@ class _ManualMeasurementScreenState
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(measurementStateProvider);
+
+    ref.listen(measurementStateProvider, _handleStateChanges);
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -179,7 +166,7 @@ class _ManualMeasurementScreenState
 
             const SizedBox(height: 16),
 
-            _InfoBadge(),
+            const _InfoBadge(),
 
             const SizedBox(height: 24),
 
@@ -217,7 +204,7 @@ class _ManualMeasurementScreenState
 
             const SizedBox(height: 12),
 
-            _CameraButton(),
+            const _CameraButton(),
 
             const SizedBox(height: 40),
           ],
@@ -227,9 +214,6 @@ class _ManualMeasurementScreenState
   }
 }
 
-/// ─────────────────────────────────────────────────────────
-/// Info Badge Widget
-/// ─────────────────────────────────────────────────────────
 class _InfoBadge extends StatelessWidget {
   const _InfoBadge();
 
@@ -253,9 +237,129 @@ class _InfoBadge extends StatelessWidget {
   }
 }
 
-/// ─────────────────────────────────────────────────────────
-/// Camera Button
-/// ─────────────────────────────────────────────────────────
+// class _CameraButton extends ConsumerWidget {
+//   const _CameraButton();
+//
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return SizedBox(
+//       width: double.infinity,
+//       height: 56,
+//       child: OutlinedButton(
+//         onPressed: () => _handleCameraPress(context, ref),
+//         child: const Text('Use Camera Measurement'),
+//       ),
+//     );
+//   }
+//
+//   Future<void> _handleCameraPress(BuildContext context, WidgetRef ref) async {
+//     final userId = ref.read(appStateProvider).userProfile?.id ?? 'guest';
+//     final hasAccess = await FirebaseService().hasActiveSubscription(userId);
+//
+//     if (!context.mounted) return;
+//
+//     if (hasAccess) {
+//       context.goNamed('camera-measurement');
+//     } else {
+//       showModalBottomSheet(
+//         context: context,
+//         isScrollControlled: true,
+//         backgroundColor: const Color(0xFF1A1A2E),
+//         shape: const RoundedRectangleBorder(
+//           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+//         ),
+//         builder: (_) => _PaywallSheet(userId: userId),
+//       );
+//     }
+//   }
+// }
+//
+// class _PaywallSheet extends StatelessWidget {
+//   final String userId;
+//   const _PaywallSheet({required this.userId});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
+//       child: Column(
+//         mainAxisSize: MainAxisSize.min,
+//         children: [
+//           Container(
+//             width: 40,
+//             height: 4,
+//             decoration: BoxDecoration(
+//               color: Colors.white24,
+//               borderRadius: BorderRadius.circular(2),
+//             ),
+//           ),
+//           const SizedBox(height: 20),
+//           const Icon(Icons.camera_alt_outlined,
+//               color: Color(0xFF7ECAC3), size: 44),
+//           const SizedBox(height: 12),
+//           const Text(
+//             'Camera Measurement is Pro',
+//             style: TextStyle(
+//               color: Colors.white,
+//               fontSize: 20,
+//               fontWeight: FontWeight.w500,
+//             ),
+//           ),
+//           const SizedBox(height: 6),
+//           const Text(
+//             'AI-powered body scanning using MoveNet\nrequires a Pro subscription.',
+//             style: TextStyle(color: Colors.white54, fontSize: 13),
+//             textAlign: TextAlign.center,
+//           ),
+//           const SizedBox(height: 28),
+//           _SheetPlanTile(
+//             label: 'Pro Monthly',
+//             price: 'PKR 999 / month',
+//             onTap: () {
+//               Navigator.pop(context);
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                   builder: (_) => PaymentScreen(
+//                     userId: userId,
+//                     planName: 'pro_monthly',
+//                     amountPKR: 999,
+//                   ),
+//                 ),
+//               );
+//             },
+//           ),
+//           const SizedBox(height: 12),
+//           _SheetPlanTile(
+//             label: 'Pro Yearly',
+//             price: 'PKR 8,999 / year  •  2 months free',
+//             isBest: true,
+//             onTap: () {
+//               Navigator.pop(context);
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                   builder: (_) => PaymentScreen(
+//                     userId: userId,
+//                     planName: 'pro_yearly',
+//                     amountPKR: 8999,
+//                   ),
+//                 ),
+//               );
+//             },
+//           ),
+//           const SizedBox(height: 16),
+//           TextButton(
+//             onPressed: () => Navigator.pop(context),
+//             child: const Text('Maybe later',
+//                 style: TextStyle(color: Colors.white38)),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 class _CameraButton extends StatelessWidget {
   const _CameraButton();
 
@@ -272,9 +376,79 @@ class _CameraButton extends StatelessWidget {
   }
 }
 
-/// ─────────────────────────────────────────────────────────
-/// Measurement Row
-/// ─────────────────────────────────────────────────────────
+
+
+class _SheetPlanTile extends StatelessWidget {
+  final String label;
+  final String price;
+  final bool isBest;
+  final VoidCallback onTap;
+
+  const _SheetPlanTile({
+    required this.label,
+    required this.price,
+    required this.onTap,
+    this.isBest = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF252540),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isBest ? const Color(0xFF7ECAC3) : Colors.white12,
+            width: isBest ? 1.5 : 0.5,
+          ),
+        ),
+        child: Row(children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                price,
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
+              ),
+            ],
+          ),
+          const Spacer(),
+          if (isBest)
+            Container(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: const Color(0xFF7ECAC3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'BEST',
+                style: TextStyle(
+                  color: Color(0xFF1A1A2E),
+                  fontSize: 9,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+        ]),
+      ),
+    );
+  }
+}
+
 class _MeasurementRow extends StatelessWidget {
   final String label;
   final double value;
@@ -305,7 +479,6 @@ class _MeasurementRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-
           Expanded(
             child: Text(
               label,
@@ -316,14 +489,11 @@ class _MeasurementRow extends StatelessWidget {
               ),
             ),
           ),
-
           IconButton(
             onPressed: atMin ? null : () => onChanged(value - step),
             icon: const Icon(Icons.remove_circle_outline),
           ),
-
           Text('${value.toStringAsFixed(1)} cm'),
-
           IconButton(
             onPressed: atMax ? null : () => onChanged(value + step),
             icon: const Icon(Icons.add_circle_outline),

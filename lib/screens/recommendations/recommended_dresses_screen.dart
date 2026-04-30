@@ -9,7 +9,11 @@ import '../../services/size_recommendation_service.dart';
 import '../../providers/app_state_provider.dart';
 
 class RecommendedDressesScreen extends ConsumerStatefulWidget {
-  const RecommendedDressesScreen({super.key});
+  /// Pass the category the user picked on the previous screen.
+  /// If null the screen shows both categories (backward-compatible).
+  final DressType? selectedType;
+
+  const RecommendedDressesScreen({super.key, this.selectedType});
 
   @override
   ConsumerState<RecommendedDressesScreen> createState() =>
@@ -18,27 +22,39 @@ class RecommendedDressesScreen extends ConsumerStatefulWidget {
 
 class _RecommendedDressesScreenState
     extends ConsumerState<RecommendedDressesScreen> {
-  DressType? _selectedType; // null = All
+  // Active filter chip — initialised from the route argument
+  late DressType? _selectedType;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedType = widget.selectedType; // null = "All"
+  }
+
+  // ── helpers ─────────────────────────────────────────────────────
+
+  String get _screenTitle {
+    switch (_selectedType) {
+      case DressType.pantShirt:
+        return 'Pant Shirt Picks';
+      case DressType.shalwarQameez:
+        return 'Shalwar Qameez Picks';
+      default:
+        return 'Recommended for You';
+    }
+  }
+
+  // ── build ────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final measurement = ref.watch(appStateProvider).latestResult;
 
+    // ── No measurements guard ──────────────────────────────────────
     if (measurement == null) {
       return Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(
-          backgroundColor: AppColors.background,
-          elevation: 0,
-          title: const Text(
-            'Recommendations',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          iconTheme: const IconThemeData(color: AppColors.textPrimary),
-        ),
+        appBar: _buildAppBar(),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -79,157 +95,74 @@ class _RecommendedDressesScreenState
       );
     }
 
+    // ── Compute recommended size & dress list ──────────────────────
     final recommendedSize =
     SizeRecommendationService.recommendSize(measurement);
 
+    // All dresses matching the user's size
     final allForSize = SizeRecommendationService.recommendedDresses(
       measurement,
       menDresses,
     );
 
+    // Apply the active category filter
     final filtered = _selectedType == null
         ? allForSize
         : allForSize.where((d) => d.type == _selectedType).toList();
 
+    // ── UI ─────────────────────────────────────────────────────────
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios,
-              color: AppColors.textPrimary, size: 20),
-          onPressed: () =>
-          context.canPop() ? context.pop() : context.goNamed('result'),
-        ),
-        title: const Text(
-          'Recommended for You',
-          style: TextStyle(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-      ),
+      appBar: _buildAppBar(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Size Banner ──────────────────────────────────────────
-          Container(
-            margin: const EdgeInsets.fromLTRB(
-              AppSpacing.paddingLarge,
-              AppSpacing.paddingSmall,
-              AppSpacing.paddingLarge,
-              AppSpacing.paddingSmall,
-            ),
-            padding: const EdgeInsets.all(AppSpacing.paddingMedium),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primary.withOpacity(0.15),
-                  AppColors.primaryLight.withOpacity(0.08),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius:
-              BorderRadius.circular(AppSpacing.radiusLarge),
-              border: Border.all(
-                color: AppColors.primary.withOpacity(0.25),
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              children: [
-                // Size badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusMedium),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.35),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    'Size ${recommendedSize.name.toUpperCase()}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 14),
-
-                // Measurement details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Your Recommended Size',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Chest: ${measurement.chest.toStringAsFixed(1)} cm',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Checkmark icon
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_outline,
-                    color: AppColors.success,
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
+          // ── Size Banner ────────────────────────────────────────
+          _SizeBanner(
+            sizeLabel: recommendedSize.name.toUpperCase(),
+            chestCm: measurement.chest,
+            typeLabel: _selectedType == null
+                ? 'All Categories'
+                : (_selectedType == DressType.pantShirt
+                ? 'Pant Shirt'
+                : 'Shalwar Qameez'),
           ),
 
-          // ── Filter Chips ─────────────────────────────────────────
+          // ── Filter Chips ───────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.paddingLarge),
-            child: Row(
-              children: [
-                _filterChip('All', null),
-                _filterChip('Pant Shirt', DressType.pantShirt),
-                _filterChip('Shalwar Qameez', DressType.shalwarQameez),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _FilterChip(
+                    label: 'All',
+                    selected: _selectedType == null,
+                    onTap: () => setState(() => _selectedType = null),
+                  ),
+                  const SizedBox(width: 8),
+                  _FilterChip(
+                    label: 'Pant Shirt',
+                    selected: _selectedType == DressType.pantShirt,
+                    onTap: () => setState(
+                            () => _selectedType = DressType.pantShirt),
+                  ),
+                  const SizedBox(width: 8),
+                  _FilterChip(
+                    label: 'Shalwar Qameez',
+                    selected: _selectedType == DressType.shalwarQameez,
+                    onTap: () => setState(
+                            () => _selectedType = DressType.shalwarQameez),
+                  ),
+                ],
+              ),
             ),
           ),
 
           const SizedBox(height: 8),
 
-          // ── Count Label ──────────────────────────────────────────
+          // ── Count Label ────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.paddingLarge),
@@ -245,37 +178,10 @@ class _RecommendedDressesScreenState
 
           const SizedBox(height: 8),
 
-          // ── Dress Grid ───────────────────────────────────────────
+          // ── Dress Grid ─────────────────────────────────────────
           Expanded(
             child: filtered.isEmpty
-                ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryLight.withOpacity(0.3),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.search_off_rounded,
-                      color: AppColors.primary,
-                      size: 32,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'No dresses found.',
-                    style: TextStyle(
-                      color: AppColors.textSecondary,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-            )
+                ? _EmptyState()
                 : GridView.builder(
               padding: const EdgeInsets.fromLTRB(
                 AppSpacing.paddingMedium,
@@ -300,44 +206,189 @@ class _RecommendedDressesScreenState
     );
   }
 
-  Widget _filterChip(String label, DressType? type) {
-    final selected = _selectedType == type;
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedType = type),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: BoxDecoration(
-            color: selected ? AppColors.primary : Colors.white,
-            borderRadius:
-            BorderRadius.circular(AppSpacing.radiusXLarge),
-            border: Border.all(
-              color: selected
-                  ? AppColors.primary
-                  : AppColors.border,
-              width: 1.5,
+  // ── AppBar ───────────────────────────────────────────────────────
+  AppBar _buildAppBar() => AppBar(
+    backgroundColor: AppColors.background,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back_ios,
+          color: AppColors.textPrimary, size: 20),
+      onPressed: () =>
+      context.canPop() ? context.pop() : context.goNamed('result'),
+    ),
+    title: Text(
+      _screenTitle,
+      style: const TextStyle(
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+    ),
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SIZE BANNER
+// ════════════════════════════════════════════════════════════════════
+
+class _SizeBanner extends StatelessWidget {
+  final String sizeLabel;
+  final double chestCm;
+  final String typeLabel;
+
+  const _SizeBanner({
+    required this.sizeLabel,
+    required this.chestCm,
+    required this.typeLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(
+        AppSpacing.paddingLarge,
+        AppSpacing.paddingSmall,
+        AppSpacing.paddingLarge,
+        AppSpacing.paddingSmall,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.paddingMedium),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withOpacity(0.15),
+            AppColors.primaryLight.withOpacity(0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.25),
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Size badge
+          Container(
+            padding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius:
+              BorderRadius.circular(AppSpacing.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.35),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            boxShadow: selected
-                ? [
-              BoxShadow(
-                color: AppColors.primary.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+            child: Text(
+              'Size $sizeLabel',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                letterSpacing: 0.5,
               ),
-            ]
-                : [],
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? Colors.white : AppColors.textSecondary,
-              fontWeight:
-              selected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 13,
             ),
+          ),
+
+          const SizedBox(width: 14),
+
+          // Measurement details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  typeLabel,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Chest: ${chestCm.toStringAsFixed(1)} cm',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Check icon
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.success.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.check_circle_outline,
+              color: AppColors.success,
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// FILTER CHIP
+// ════════════════════════════════════════════════════════════════════
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXLarge),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.border,
+            width: 1.5,
+          ),
+          boxShadow: selected
+              ? [
+            BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ]
+              : [],
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? Colors.white : AppColors.textSecondary,
+            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            fontSize: 13,
           ),
         ),
       ),
@@ -345,7 +396,47 @@ class _RecommendedDressesScreenState
   }
 }
 
-// ── Dress Card ──────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════
+// EMPTY STATE
+// ════════════════════════════════════════════════════════════════════
+
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withOpacity(0.3),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.search_off_rounded,
+              color: AppColors.primary,
+              size: 32,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'No dresses found.',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 15,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// DRESS CARD
+// ════════════════════════════════════════════════════════════════════
 
 class _DressCard extends StatelessWidget {
   final Dress dress;
@@ -368,7 +459,7 @@ class _DressCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Image ─────────────────────────────────────────────
+          // ── Image ──────────────────────────────────────────────
           Expanded(
             child: ClipRRect(
               borderRadius: const BorderRadius.vertical(
@@ -401,7 +492,7 @@ class _DressCard extends StatelessWidget {
                     },
                   ),
 
-                  // Size badge overlay (top-left)
+                  // Size badge overlay
                   Positioned(
                     top: 8,
                     left: 8,
@@ -436,7 +527,7 @@ class _DressCard extends StatelessWidget {
             ),
           ),
 
-          // ── Info ──────────────────────────────────────────────
+          // ── Info ───────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(AppSpacing.paddingSmall),
             child: Column(
@@ -444,8 +535,8 @@ class _DressCard extends StatelessWidget {
               children: [
                 // Type pill
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 6, vertical: 2),
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppColors.primaryLight.withOpacity(0.25),
                     borderRadius: BorderRadius.circular(4),

@@ -21,7 +21,7 @@ class CategorySelectionScreen extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            
+
             const Text(
               'Choose your category',
               style: TextStyle(
@@ -30,9 +30,9 @@ class CategorySelectionScreen extends ConsumerWidget {
                 color: AppColors.textPrimary,
               ),
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             const Text(
               'Select the category that best fits you',
               style: TextStyle(
@@ -40,9 +40,20 @@ class CategorySelectionScreen extends ConsumerWidget {
                 color: AppColors.textSecondary,
               ),
             ),
-            
-            const SizedBox(height: 40),
-            
+
+            const SizedBox(height: 10),
+
+// 🔽 ADD THIS BUTTON HERE
+            TextButton(
+              onPressed: () => context.goNamed('calibration'),
+              child: const Text(
+                'Open Calibration Tool',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
             Expanded(
               child: GridView.count(
                 crossAxisCount: 1,

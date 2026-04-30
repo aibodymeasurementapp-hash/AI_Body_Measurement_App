@@ -1,13 +1,12 @@
 class Measurement {
   final String id;
-  final double height;          // total body height (from profile or user input)
-  final double shirtLength;     // shoulder → hip (upper body / torso length)
+  final double height;
+  final double shirtLength;
   final double waist;
   final double chest;
   final double shoulder;
   final double sleevesLength;
-  final double hip;
-  final double inseam;          // hip → ankle (lower body / trouser length)
+  final double inseam;
   final String additionalInstructions;
   final DateTime createdAt;
 
@@ -19,7 +18,6 @@ class Measurement {
     required this.chest,
     required this.shoulder,
     required this.sleevesLength,
-    required this.hip,
     required this.inseam,
     required this.additionalInstructions,
     required this.createdAt,
@@ -33,7 +31,6 @@ class Measurement {
     double? chest,
     double? shoulder,
     double? sleevesLength,
-    double? hip,
     double? inseam,
     String? additionalInstructions,
     DateTime? createdAt,
@@ -46,7 +43,6 @@ class Measurement {
       chest: chest ?? this.chest,
       shoulder: shoulder ?? this.shoulder,
       sleevesLength: sleevesLength ?? this.sleevesLength,
-      hip: hip ?? this.hip,
       inseam: inseam ?? this.inseam,
       additionalInstructions: additionalInstructions ?? this.additionalInstructions,
       createdAt: createdAt ?? this.createdAt,
@@ -59,7 +55,6 @@ class MeasurementResult {
   final double shoulderWidth;
   final double chest;
   final double waist;
-  final double hip;
   final double leftArmLength;
   final double rightArmLength;
   final double leftLegLength;
@@ -74,7 +69,6 @@ class MeasurementResult {
     required this.shoulderWidth,
     required this.chest,
     required this.waist,
-    required this.hip,
     required this.leftArmLength,
     required this.rightArmLength,
     required this.leftLegLength,

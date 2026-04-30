@@ -8,6 +8,7 @@ import '../../widgets/custom_app_bar.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_profile.dart';
 import '../../providers/app_state_provider.dart';
+import '../../services/revenuecat_service.dart'; // ← add this
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -34,11 +35,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void initState() {
     super.initState();
 
-    /// ✅ FIXED (Riverpod correct usage)
-    ref.listenManual(authStateProvider, (previous, next) {
+    // ✅ After successful register → show paywall if not premium, then navigate
+    ref.listenManual(authStateProvider, (previous, next) async {
       if (next.isAuthenticated && !next.isLoading) {
         ref.read(appStateProvider.notifier).setUserProfile(next.user!);
-        context.goNamed('category');
+
+        // New users will never be premium — paywall will always show here.
+        // They can purchase or dismiss and continue.
+        await RevenueCatService.presentPaywallIfNeeded(context);
+
+        if (context.mounted) context.goNamed('category');
       }
     });
   }
@@ -53,10 +59,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     _weightController.dispose();
     super.dispose();
   }
-
-  // ─────────────────────────────
-  // ACTIONS
-  // ─────────────────────────────
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
@@ -78,7 +80,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
-  // HEIGHT
   void _incHeight() {
     if (_heightCm < 220) setState(() => _heightCm++);
   }
@@ -87,7 +88,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (_heightCm > 100) setState(() => _heightCm--);
   }
 
-  // AGE
   void _incAge() {
     if (_age < 80) setState(() => _age++);
   }
@@ -101,7 +101,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authState = ref.watch(authStateProvider);
 
     return Scaffold(
-      appBar: const CustomAppBar(title: 'Create Account'),
+      appBar: CustomAppBar(
+        title: 'Create Account',
+        onBackPressed: () => context.goNamed('login'),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.paddingLarge),
@@ -109,8 +112,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             key: _formKey,
             child: Column(
               children: [
-
-                /// NAME
                 AppTextField(
                   label: 'Full Name',
                   hintText: 'Enter your full name',
@@ -120,7 +121,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                /// EMAIL
                 AppTextField(
                   label: 'Email',
                   hintText: 'Enter email',
@@ -133,7 +133,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                /// PHONE
                 AppTextField(
                   label: 'Phone',
                   hintText: 'Enter phone',
@@ -143,7 +142,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                /// PASSWORD
                 AppTextField(
                   label: 'Password',
                   hintText: 'Enter password',
@@ -157,7 +155,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                /// CONFIRM PASSWORD
                 AppTextField(
                   label: 'Confirm Password',
                   hintText: 'Confirm password',
@@ -166,10 +163,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   validator: (v) =>
                   v != _passwordController.text ? 'Not match' : null,
                 ),
-
                 const SizedBox(height: 24),
 
-                /// GENDER
                 Row(
                   children: Gender.values.map((g) {
                     return Expanded(
@@ -200,10 +195,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     );
                   }).toList(),
                 ),
-
                 const SizedBox(height: 24),
 
-                /// HEIGHT
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -229,10 +222,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
-                /// AGE (Buttons + Slider)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -254,15 +245,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       max: 80,
                       divisions: 70,
                       activeColor: AppColors.primary,
-                      onChanged: (v) =>
-                          setState(() => _age = v.round()),
+                      onChanged: (v) => setState(() => _age = v.round()),
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 20),
 
-                /// WEIGHT
                 AppTextField(
                   label: 'Weight (kg)',
                   hintText: 'Enter your weight',
@@ -274,7 +262,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     return null;
                   },
                 ),
-
                 const SizedBox(height: 30),
 
                 if (authState.error != null)
@@ -288,7 +275,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   onPressed: _register,
                   isLoading: authState.isLoading,
                 ),
-
                 const SizedBox(height: 20),
 
                 GestureDetector(

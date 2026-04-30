@@ -10,8 +10,6 @@ class MeasurementService {
     await Future.delayed(const Duration(seconds: 1));
   }
 
-  // ── Manual measurements ────────────────────────────────────────────────
-  // Direct 1-to-1 mapping — no camera, no gyro needed.
   Future<MeasurementResult> processManualMeasurements(
       Measurement measurement,
       ) async {
@@ -23,7 +21,6 @@ class MeasurementService {
       shoulderWidth:   measurement.shoulder,
       chest:           measurement.chest,
       waist:           measurement.waist,
-      hip:             measurement.hip,
       upperBodyLength: measurement.shirtLength,
       lowerBodyLength: measurement.inseam,
       leftArmLength:   measurement.sleevesLength,
@@ -34,27 +31,18 @@ class MeasurementService {
     );
   }
 
-  // ── Camera AI measurements ─────────────────────────────────────────────
-  //
-  // [imagePath]            — path to the captured photo
-  // [userHeightCm]         — from UserProfile, sets the pixel→cm scale
-  // [userProfile]          — optional; drives BMI-based depth estimation.
-  //                          Pass null to use defaults (average build, age 28).
-  // [gyroCorrectionFactor] — cos(tiltAngle) from GyroService at capture time.
-  //                          1.0 = no tilt (default / fallback).
   Future<MeasurementResult> processCameraMeasurements(
       String imagePath,
       double userHeightCm, {
-        UserProfile? userProfile,          // ← NEW
-        double gyroCorrectionFactor = 1.0, // ← NEW
+        UserProfile? userProfile,
+        double gyroCorrectionFactor = 1.0,
       }) async {
     await _simulateProcessing();
 
     final Pose? pose = PoseNotifier.lastPose;
 
     if (pose == null) {
-      throw Exception(
-          "Pose not detected. Please retake the photo.");
+      throw Exception("Pose not detected. Please retake the photo.");
     }
 
     if (!pose.hasValidKeypoints()) {
@@ -65,9 +53,9 @@ class MeasurementService {
 
     return MeasurementCalculator.calculate(
       pose,
-      userHeightCm:          userHeightCm,
-      userProfile:           userProfile,          // ← passed through
-      gyroCorrectionFactor:  gyroCorrectionFactor, // ← passed through
+      userHeightCm:         userHeightCm,
+      userProfile:          userProfile,
+      gyroCorrectionFactor: gyroCorrectionFactor,
     );
   }
 }
