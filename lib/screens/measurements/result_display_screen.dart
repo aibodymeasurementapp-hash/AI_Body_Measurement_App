@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../constants/app_constants.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../widgets/primary_button.dart';
 import '../../providers/app_state_provider.dart';
+import '../../services/measurement_history_service.dart';
 
 class ResultDisplayScreen extends ConsumerWidget {
   final String source;
@@ -49,7 +51,6 @@ class ResultDisplayScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.paddingLarge),
         child: Column(
           children: [
-
             const Text(
               'Your Measurements',
               style: TextStyle(
@@ -86,8 +87,8 @@ class ResultDisplayScreen extends ConsumerWidget {
               icon: Icons.accessibility_new,
               measurements: [
                 _MeasurementItem('Shoulder Width', result.shoulderWidth),
-                _MeasurementItem('Chest',          result.chest),
-                _MeasurementItem('Waist',          result.waist),
+                _MeasurementItem('Chest', result.chest),
+                _MeasurementItem('Waist', result.waist),
               ],
             ),
 
@@ -97,7 +98,7 @@ class ResultDisplayScreen extends ConsumerWidget {
               title: 'Sleeve Length',
               icon: Icons.open_in_full,
               measurements: [
-                _MeasurementItem('Left Sleeve',  result.leftArmLength),
+                _MeasurementItem('Left Sleeve', result.leftArmLength),
                 _MeasurementItem('Right Sleeve', result.rightArmLength),
               ],
             ),
@@ -108,7 +109,7 @@ class ResultDisplayScreen extends ConsumerWidget {
               title: 'Trouser Length',
               icon: Icons.straighten,
               measurements: [
-                _MeasurementItem('Left Leg',  result.leftLegLength),
+                _MeasurementItem('Left Leg', result.leftLegLength),
                 _MeasurementItem('Right Leg', result.rightLegLength),
               ],
             ),
@@ -117,14 +118,43 @@ class ResultDisplayScreen extends ConsumerWidget {
 
             PrimaryButton(
               text: 'Save Result',
-              onPressed: () {
-                ref.read(appStateProvider.notifier).saveResult(result);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Result saved successfully!'),
-                    backgroundColor: AppColors.success,
-                  ),
-                );
+              onPressed: () async {
+                try {
+                  ref.read(appStateProvider.notifier).saveResult(result);
+
+                  await ref
+                      .read(measurementHistoryServiceProvider)
+                      .saveMeasurementResult(
+                    source: source,
+                    createdAt: result.createdAt,
+                    height: result.height,
+                    shoulderWidth: result.shoulderWidth,
+                    chest: result.chest,
+                    waist: result.waist,
+                    leftArmLength: result.leftArmLength,
+                    rightArmLength: result.rightArmLength,
+                    leftLegLength: result.leftLegLength,
+                    rightLegLength: result.rightLegLength,
+                  );
+
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Result saved successfully!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                } catch (e) {
+                  if (!context.mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to save result: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
             ),
 
@@ -138,8 +168,9 @@ class ResultDisplayScreen extends ConsumerWidget {
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.primary, width: 2),
                   shape: RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusLarge),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusLarge,
+                    ),
                   ),
                 ),
                 child: const Text(
@@ -155,13 +186,51 @@ class ResultDisplayScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            TextButton(
-              onPressed: () => context.goNamed('category'),
-              child: const Text(
-                'Back to Home',
-                style: TextStyle(
-                    color: AppColors.textSecondary, fontSize: 16),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () => context.goNamed('category'),
+                      icon: const Icon(
+                        Icons.home_outlined,
+                        color: AppColors.textSecondary,
+                        size: 20,
+                      ),
+                      label: const Text(
+                        'Back to Home',
+                        style: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () => context.goNamed('measurement-history'),
+                      icon: const Icon(
+                        Icons.history,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                      label: const Text(
+                        'View History',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 40),
@@ -171,8 +240,9 @@ class ResultDisplayScreen extends ConsumerWidget {
     );
   }
 
-  String _formatDate(DateTime date) =>
-      '${date.day}/${date.month}/${date.year}';
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
 }
 
 class _MeasurementSection extends StatelessWidget {
@@ -200,8 +270,9 @@ class _MeasurementSection extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius:
-                    BorderRadius.circular(AppSpacing.radiusSmall),
+                    borderRadius: BorderRadius.circular(
+                      AppSpacing.radiusSmall,
+                    ),
                   ),
                   child: Icon(icon, color: Colors.white, size: 20),
                 ),
@@ -262,5 +333,6 @@ class _MeasurementSection extends StatelessWidget {
 class _MeasurementItem {
   final String name;
   final double value;
+
   _MeasurementItem(this.name, this.value);
 }

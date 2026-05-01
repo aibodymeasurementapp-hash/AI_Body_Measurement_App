@@ -14,9 +14,11 @@ import '../screens/recommendations/recommended_dresses_screen.dart';
 import '../screens/measurements/live_camera_screen.dart';
 import '../screens/calibration/pose_calibration_screen.dart';
 
-import '../screens/payment/payment_screen.dart';
-import '../screens/payment/plan_screen.dart';
+import '../screens/payment/payment_screen.dart' show PaymentScreen;
+import '../screens/payment/plan_screen.dart' show PlanScreen;
 import '../screens/payment/payment_success_screen.dart';
+
+import '../screens/measurements/measurement_history_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -110,6 +112,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/payment-success',
         name: 'payment-success',
         builder: (context, state) => const PaymentSuccessScreen(),
+      ),
+      GoRoute(
+        path: '/measurement-history',
+        name: 'measurement-history',
+        builder: (context, state) => const MeasurementHistoryScreen(),
       ),
     ],
   );

@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../constants/app_constants.dart';
 import '../../widgets/custom_app_bar.dart';
 import '../../providers/app_state_provider.dart';
@@ -8,6 +10,14 @@ import '../../models/dress.dart';
 
 class CategorySelectionScreen extends ConsumerWidget {
   const CategorySelectionScreen({super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    if (!context.mounted) return;
+
+    context.goNamed('login');
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,7 +53,6 @@ class CategorySelectionScreen extends ConsumerWidget {
 
             const SizedBox(height: 10),
 
-// 🔽 ADD THIS BUTTON HERE
             TextButton(
               onPressed: () => context.goNamed('calibration'),
               child: const Text(
@@ -65,7 +74,9 @@ class CategorySelectionScreen extends ConsumerWidget {
                     title: 'MEN',
                     imageUrl: AppImages.menCategory,
                     onTap: () {
-                      ref.read(appStateProvider.notifier).setSelectedCategory(DressCategory.men);
+                      ref
+                          .read(appStateProvider.notifier)
+                          .setSelectedCategory(DressCategory.men);
                       context.goNamed('dress-type');
                     },
                   ),
@@ -73,7 +84,9 @@ class CategorySelectionScreen extends ConsumerWidget {
                     title: 'WOMEN',
                     imageUrl: AppImages.womenCategory,
                     onTap: () {
-                      ref.read(appStateProvider.notifier).setSelectedCategory(DressCategory.women);
+                      ref
+                          .read(appStateProvider.notifier)
+                          .setSelectedCategory(DressCategory.women);
                       context.goNamed('dress-type');
                     },
                   ),
@@ -81,11 +94,49 @@ class CategorySelectionScreen extends ConsumerWidget {
                     title: 'KIDS',
                     imageUrl: AppImages.kidsCategory,
                     onTap: () {
-                      ref.read(appStateProvider.notifier).setSelectedCategory(DressCategory.kids);
+                      ref
+                          .read(appStateProvider.notifier)
+                          .setSelectedCategory(DressCategory.kids);
                       context.goNamed('dress-type');
                     },
                   ),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            SafeArea(
+              top: false,
+              child: SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: () => _logout(context),
+                  icon: const Icon(
+                    Icons.logout,
+                    color: AppColors.primary,
+                  ),
+                  label: const Text(
+                    'Logout',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusLarge,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -110,16 +161,13 @@ class _CategoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsive sizes (all based on screen width)
-    final titleFontSize = screenWidth * 0.09;         // ≈32–42 px, big & bold
-    final badgeFontSize = screenWidth * 0.04;         // ≈14–18 px
-    final cardPaddingHorizontal = screenWidth * 0.05; // ≈18–25 px
-    final cardPaddingVertical = screenWidth * 0.03;   // ≈11–16 px
-    final imageWidth = screenWidth * 0.38;            // ≈130–160 px, responsive
+    final titleFontSize = screenWidth * 0.09;
+    final badgeFontSize = screenWidth * 0.04;
+    final cardPaddingHorizontal = screenWidth * 0.05;
+    final cardPaddingVertical = screenWidth * 0.03;
+    final imageWidth = screenWidth * 0.38;
     final badgePaddingHorizontal = screenWidth * 0.05;
     final badgePaddingVertical = screenWidth * 0.025;
-
-    print('Trying to load image for $title: $imageUrl');
 
     return GestureDetector(
       onTap: onTap,
@@ -127,7 +175,7 @@ class _CategoryCard extends StatelessWidget {
         elevation: 8,
         shadowColor: Colors.black26,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),  // softer, modern corners
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Container(
           decoration: BoxDecoration(
@@ -143,7 +191,6 @@ class _CategoryCard extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Right-side image (responsive width)
               Positioned(
                 right: 0,
                 top: 0,
@@ -163,7 +210,7 @@ class _CategoryCard extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Icon(
                           Icons.person,
-                          size: screenWidth * 0.10,  // ≈36–50 px
+                          size: screenWidth * 0.10,
                           color: AppColors.textSecondary,
                         ),
                       );
@@ -172,7 +219,6 @@ class _CategoryCard extends StatelessWidget {
                 ),
               ),
 
-              // Left-side content (text + badge)
               Positioned.fill(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
