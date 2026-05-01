@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "334454988022",
+    "project_id": "aibodymesurementapp",
+    "storage_bucket": "aibodymesurementapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:334454988022:android:fdf4469ea7c8e0b0d8e0d7",
+        "android_client_info": {
+          "package_name": "com.zenbytes.AImeasurementApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCMp8GBeDew5hm3mUb_24EBAlQXZ-bvV8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
