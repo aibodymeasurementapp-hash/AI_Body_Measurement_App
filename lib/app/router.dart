@@ -12,8 +12,6 @@ import '../screens/measurements/result_display_screen.dart'
     show ResultDisplayScreen;
 import '../screens/recommendations/recommended_dresses_screen.dart';
 import '../screens/measurements/live_camera_screen.dart';
-import '../screens/calibration/pose_calibration_screen.dart';
-
 import '../screens/payment/payment_screen.dart' show PaymentScreen;
 import '../screens/payment/plan_screen.dart' show PlanScreen;
 import '../screens/payment/payment_success_screen.dart';
@@ -81,16 +79,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RecommendedDressesScreen(),
       ),
 
-      GoRoute(
-        path: '/calibration',
-        name: 'calibration',
-        builder: (context, state) => const PoseCalibrationScreen(
-          actualHeightCm: 167.0,
-          actualShoulderCm: 43.0,
-          actualChestCm: 96.0,
-          actualWaistCm: 76.0,
-        ),
-      ),
+
 
       // Optional teaser screen.
       // It should only show features and send user to /payment.

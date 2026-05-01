@@ -51,15 +51,7 @@ class CategorySelectionScreen extends ConsumerWidget {
               ),
             ),
 
-            const SizedBox(height: 10),
 
-            TextButton(
-              onPressed: () => context.goNamed('calibration'),
-              child: const Text(
-                'Open Calibration Tool',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ),
 
             const SizedBox(height: 30),
 
