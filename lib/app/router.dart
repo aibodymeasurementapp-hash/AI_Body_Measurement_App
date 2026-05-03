@@ -15,8 +15,11 @@ import '../screens/measurements/live_camera_screen.dart';
 import '../screens/payment/payment_screen.dart' show PaymentScreen;
 import '../screens/payment/plan_screen.dart' show PlanScreen;
 import '../screens/payment/payment_success_screen.dart';
-
 import '../screens/measurements/measurement_history_screen.dart';
+import '../screens/recommendations/dress_detail_screen.dart';
+
+// ✅ Fix: Dress model must be imported so router.dart can cast state.extra
+import '../models/dress.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -79,8 +82,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RecommendedDressesScreen(),
       ),
 
-
-
       // Optional teaser screen.
       // It should only show features and send user to /payment.
       GoRoute(
@@ -102,10 +103,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'payment-success',
         builder: (context, state) => const PaymentSuccessScreen(),
       ),
+
       GoRoute(
         path: '/measurement-history',
         name: 'measurement-history',
         builder: (context, state) => const MeasurementHistoryScreen(),
+      ),
+
+      // ✅ Dress detail route — receives Dress object via state.extra
+      GoRoute(
+        path: '/dress-detail',
+        name: 'dress-detail',
+        builder: (context, state) => DressDetailScreen(
+          dress: state.extra as Dress,
+        ),
       ),
     ],
   );

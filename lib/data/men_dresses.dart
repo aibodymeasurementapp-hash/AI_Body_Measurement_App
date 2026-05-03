@@ -1,100 +1,207 @@
 import '../models/dress.dart';
 
-// 7 pant-shirt styles × 4 sizes  = 28 entries
+// 7 pant-shirt pairs × 4 sizes = 28 entries
 // 7 shalwar qameez styles × 4 sizes = 28 entries
-// Total: 56 entries
+// Total clothes only: 56 entries
+//
+// Important:
+// This file uses local asset images.
+// Make sure the image files exist in the exact paths used below.
 
-const List<Dress> menDresses = [
-
-  // ══════════════════════════════════════════════════════════════════
-  // PANT SHIRT
-  // ══════════════════════════════════════════════════════════════════
-
-  // ── 1. Formal White Dress Shirt ───────────────────────────────────
-  Dress(id: 'ps_1_s',  title: 'Formal White Dress Shirt',    description: 'Classic white formal shirt, perfect for office and formal events. Crisp cotton blend with a slim fit.',                          price: 1800, imageUrl: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_1_m',  title: 'Formal White Dress Shirt',    description: 'Classic white formal shirt, perfect for office and formal events. Crisp cotton blend with a slim fit.',                          price: 1800, imageUrl: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_1_l',  title: 'Formal White Dress Shirt',    description: 'Classic white formal shirt, perfect for office and formal events. Crisp cotton blend with a slim fit.',                          price: 1800, imageUrl: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_1_xl', title: 'Formal White Dress Shirt',    description: 'Classic white formal shirt, perfect for office and formal events. Crisp cotton blend with a slim fit.',                          price: 1800, imageUrl: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ── 2. Casual Checkered Shirt ─────────────────────────────────────
-  Dress(id: 'ps_2_s',  title: 'Casual Checkered Shirt',      description: 'Stylish red & navy checkered casual shirt for an everyday smart-casual look. Soft brushed cotton.',                             price: 1400, imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_2_m',  title: 'Casual Checkered Shirt',      description: 'Stylish red & navy checkered casual shirt for an everyday smart-casual look. Soft brushed cotton.',                             price: 1400, imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_2_l',  title: 'Casual Checkered Shirt',      description: 'Stylish red & navy checkered casual shirt for an everyday smart-casual look. Soft brushed cotton.',                             price: 1400, imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_2_xl', title: 'Casual Checkered Shirt',      description: 'Stylish red & navy checkered casual shirt for an everyday smart-casual look. Soft brushed cotton.',                             price: 1400, imageUrl: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ── 3. Navy Blue Polo Shirt ───────────────────────────────────────
-  Dress(id: 'ps_3_s',  title: 'Navy Blue Polo Shirt',        description: 'Comfortable piqué cotton polo shirt in navy blue. Pairs perfectly with khaki chinos for a polished look.',                     price: 1200, imageUrl: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_3_m',  title: 'Navy Blue Polo Shirt',        description: 'Comfortable piqué cotton polo shirt in navy blue. Pairs perfectly with khaki chinos for a polished look.',                     price: 1200, imageUrl: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_3_l',  title: 'Navy Blue Polo Shirt',        description: 'Comfortable piqué cotton polo shirt in navy blue. Pairs perfectly with khaki chinos for a polished look.',                     price: 1200, imageUrl: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_3_xl', title: 'Navy Blue Polo Shirt',        description: 'Comfortable piqué cotton polo shirt in navy blue. Pairs perfectly with khaki chinos for a polished look.',                     price: 1200, imageUrl: 'https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ── 4. Slim Fit Black Trousers ────────────────────────────────────
-  Dress(id: 'ps_4_s',  title: 'Slim Fit Black Trousers',     description: 'Classic slim-fit black trousers with a mid-rise waist. Pairs well with any formal or casual shirt.',                           price: 2200, imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_4_m',  title: 'Slim Fit Black Trousers',     description: 'Classic slim-fit black trousers with a mid-rise waist. Pairs well with any formal or casual shirt.',                           price: 2200, imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_4_l',  title: 'Slim Fit Black Trousers',     description: 'Classic slim-fit black trousers with a mid-rise waist. Pairs well with any formal or casual shirt.',                           price: 2200, imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_4_xl', title: 'Slim Fit Black Trousers',     description: 'Classic slim-fit black trousers with a mid-rise waist. Pairs well with any formal or casual shirt.',                           price: 2200, imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ── 5. Sky Blue Oxford Shirt ──────────────────────────────────────
-  Dress(id: 'ps_5_s',  title: 'Sky Blue Oxford Shirt',       description: 'Versatile sky-blue Oxford button-down. Worn tucked for meetings or untucked on weekends — always sharp.',                      price: 1600, imageUrl: 'https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_5_m',  title: 'Sky Blue Oxford Shirt',       description: 'Versatile sky-blue Oxford button-down. Worn tucked for meetings or untucked on weekends — always sharp.',                      price: 1600, imageUrl: 'https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_5_l',  title: 'Sky Blue Oxford Shirt',       description: 'Versatile sky-blue Oxford button-down. Worn tucked for meetings or untucked on weekends — always sharp.',                      price: 1600, imageUrl: 'https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_5_xl', title: 'Sky Blue Oxford Shirt',       description: 'Versatile sky-blue Oxford button-down. Worn tucked for meetings or untucked on weekends — always sharp.',                      price: 1600, imageUrl: 'https://images.unsplash.com/photo-1607345366928-199ea26cfe3e?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ── 6. Olive Green Casual Shirt ───────────────────────────────────
-  Dress(id: 'ps_6_s',  title: 'Olive Green Casual Shirt',    description: 'Relaxed-fit olive green linen shirt, great for outings and travel. Light and breathable for summer.',                           price: 1350, imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_6_m',  title: 'Olive Green Casual Shirt',    description: 'Relaxed-fit olive green linen shirt, great for outings and travel. Light and breathable for summer.',                           price: 1350, imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_6_l',  title: 'Olive Green Casual Shirt',    description: 'Relaxed-fit olive green linen shirt, great for outings and travel. Light and breathable for summer.',                           price: 1350, imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_6_xl', title: 'Olive Green Casual Shirt',    description: 'Relaxed-fit olive green linen shirt, great for outings and travel. Light and breathable for summer.',                           price: 1350, imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ── 7. Charcoal Chino Trousers ────────────────────────────────────
-  Dress(id: 'ps_7_s',  title: 'Charcoal Chino Trousers',     description: 'Smart charcoal chinos with a straight-leg cut. Versatile enough for both office and casual wear.',                             price: 2000, imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.s),
-  Dress(id: 'ps_7_m',  title: 'Charcoal Chino Trousers',     description: 'Smart charcoal chinos with a straight-leg cut. Versatile enough for both office and casual wear.',                             price: 2000, imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.m),
-  Dress(id: 'ps_7_l',  title: 'Charcoal Chino Trousers',     description: 'Smart charcoal chinos with a straight-leg cut. Versatile enough for both office and casual wear.',                             price: 2000, imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.l),
-  Dress(id: 'ps_7_xl', title: 'Charcoal Chino Trousers',     description: 'Smart charcoal chinos with a straight-leg cut. Versatile enough for both office and casual wear.',                             price: 2000, imageUrl: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.pantShirt, size: DressSize.xl),
-
-  // ══════════════════════════════════════════════════════════════════
-  // SHALWAR QAMEEZ
-  // ══════════════════════════════════════════════════════════════════
-
-  // ── 1. Classic White Shalwar Qameez ──────────────────────────────
-  Dress(id: 'sq_1_s',  title: 'Classic White Shalwar Qameez',       description: 'Traditional white cotton shalwar qameez, perfect for casual and formal wear. A wardrobe staple.',                       price: 2500, imageUrl: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_1_m',  title: 'Classic White Shalwar Qameez',       description: 'Traditional white cotton shalwar qameez, perfect for casual and formal wear. A wardrobe staple.',                       price: 2500, imageUrl: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_1_l',  title: 'Classic White Shalwar Qameez',       description: 'Traditional white cotton shalwar qameez, perfect for casual and formal wear. A wardrobe staple.',                       price: 2500, imageUrl: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_1_xl', title: 'Classic White Shalwar Qameez',       description: 'Traditional white cotton shalwar qameez, perfect for casual and formal wear. A wardrobe staple.',                       price: 2500, imageUrl: 'https://images.unsplash.com/photo-1614252369475-531eba835eb1?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
-
-  // ── 2. Embroidered Blue Shalwar Qameez ───────────────────────────
-  Dress(id: 'sq_2_s',  title: 'Embroidered Blue Shalwar Qameez',    description: 'Premium embroidered royal-blue qameez with matching shalwar. Ideal for Eid celebrations and weddings.',                 price: 4200, imageUrl: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_2_m',  title: 'Embroidered Blue Shalwar Qameez',    description: 'Premium embroidered royal-blue qameez with matching shalwar. Ideal for Eid celebrations and weddings.',                 price: 4200, imageUrl: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_2_l',  title: 'Embroidered Blue Shalwar Qameez',    description: 'Premium embroidered royal-blue qameez with matching shalwar. Ideal for Eid celebrations and weddings.',                 price: 4200, imageUrl: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_2_xl', title: 'Embroidered Blue Shalwar Qameez',    description: 'Premium embroidered royal-blue qameez with matching shalwar. Ideal for Eid celebrations and weddings.',                 price: 4200, imageUrl: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
-
-  // ── 3. Grey Linen Shalwar Qameez ─────────────────────────────────
-  Dress(id: 'sq_3_s',  title: 'Grey Linen Shalwar Qameez',          description: 'Lightweight grey linen shalwar qameez — breathable and comfortable, perfect for hot Pakistani summers.',               price: 3200, imageUrl: 'https://images.unsplash.com/photo-1602810316693-3667c854239a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_3_m',  title: 'Grey Linen Shalwar Qameez',          description: 'Lightweight grey linen shalwar qameez — breathable and comfortable, perfect for hot Pakistani summers.',               price: 3200, imageUrl: 'https://images.unsplash.com/photo-1602810316693-3667c854239a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_3_l',  title: 'Grey Linen Shalwar Qameez',          description: 'Lightweight grey linen shalwar qameez — breathable and comfortable, perfect for hot Pakistani summers.',               price: 3200, imageUrl: 'https://images.unsplash.com/photo-1602810316693-3667c854239a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_3_xl', title: 'Grey Linen Shalwar Qameez',          description: 'Lightweight grey linen shalwar qameez — breathable and comfortable, perfect for hot Pakistani summers.',               price: 3200, imageUrl: 'https://images.unsplash.com/photo-1602810316693-3667c854239a?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
-
-  // ── 4. Black Luxury Shalwar Qameez ───────────────────────────────
-  Dress(id: 'sq_4_s',  title: 'Black Luxury Shalwar Qameez',        description: 'Rich black fabric with subtle silver thread work. Ideal for formal dinners, engagements and evening events.',           price: 5500, imageUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_4_m',  title: 'Black Luxury Shalwar Qameez',        description: 'Rich black fabric with subtle silver thread work. Ideal for formal dinners, engagements and evening events.',           price: 5500, imageUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_4_l',  title: 'Black Luxury Shalwar Qameez',        description: 'Rich black fabric with subtle silver thread work. Ideal for formal dinners, engagements and evening events.',           price: 5500, imageUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_4_xl', title: 'Black Luxury Shalwar Qameez',        description: 'Rich black fabric with subtle silver thread work. Ideal for formal dinners, engagements and evening events.',           price: 5500, imageUrl: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
-
-  // ── 5. Mint Green Lawn Shalwar Qameez ────────────────────────────
-  Dress(id: 'sq_5_s',  title: 'Mint Green Lawn Shalwar Qameez',     description: 'Fresh mint-green lawn fabric shalwar qameez. Light, airy and perfect for casual daytime outings.',                      price: 2800, imageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_5_m',  title: 'Mint Green Lawn Shalwar Qameez',     description: 'Fresh mint-green lawn fabric shalwar qameez. Light, airy and perfect for casual daytime outings.',                      price: 2800, imageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_5_l',  title: 'Mint Green Lawn Shalwar Qameez',     description: 'Fresh mint-green lawn fabric shalwar qameez. Light, airy and perfect for casual daytime outings.',                      price: 2800, imageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_5_xl', title: 'Mint Green Lawn Shalwar Qameez',     description: 'Fresh mint-green lawn fabric shalwar qameez. Light, airy and perfect for casual daytime outings.',                      price: 2800, imageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
-
-  // ── 6. Maroon Khaddar Shalwar Qameez ─────────────────────────────
-  Dress(id: 'sq_6_s',  title: 'Maroon Khaddar Shalwar Qameez',      description: 'Warm maroon khaddar shalwar qameez — thick, cozy fabric ideal for winter months and chilly evenings.',                  price: 3800, imageUrl: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_6_m',  title: 'Maroon Khaddar Shalwar Qameez',      description: 'Warm maroon khaddar shalwar qameez — thick, cozy fabric ideal for winter months and chilly evenings.',                  price: 3800, imageUrl: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_6_l',  title: 'Maroon Khaddar Shalwar Qameez',      description: 'Warm maroon khaddar shalwar qameez — thick, cozy fabric ideal for winter months and chilly evenings.',                  price: 3800, imageUrl: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_6_xl', title: 'Maroon Khaddar Shalwar Qameez',      description: 'Warm maroon khaddar shalwar qameez — thick, cozy fabric ideal for winter months and chilly evenings.',                  price: 3800, imageUrl: 'https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
-
-  // ── 7. Beige Printed Shalwar Qameez ──────────────────────────────
-  Dress(id: 'sq_7_s',  title: 'Beige Printed Shalwar Qameez',       description: 'Elegant beige shalwar qameez with subtle geometric print. Great for semi-formal family gatherings.',                    price: 3500, imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.s),
-  Dress(id: 'sq_7_m',  title: 'Beige Printed Shalwar Qameez',       description: 'Elegant beige shalwar qameez with subtle geometric print. Great for semi-formal family gatherings.',                    price: 3500, imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.m),
-  Dress(id: 'sq_7_l',  title: 'Beige Printed Shalwar Qameez',       description: 'Elegant beige shalwar qameez with subtle geometric print. Great for semi-formal family gatherings.',                    price: 3500, imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.l),
-  Dress(id: 'sq_7_xl', title: 'Beige Printed Shalwar Qameez',       description: 'Elegant beige shalwar qameez with subtle geometric print. Great for semi-formal family gatherings.',                    price: 3500, imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop', category: DressCategory.men, type: DressType.shalwarQameez, size: DressSize.xl),
+const List<DressSize> _sizes = [
+  DressSize.s,
+  DressSize.m,
+  DressSize.l,
+  DressSize.xl,
 ];
+
+String _sizeCode(DressSize size) {
+  switch (size) {
+    case DressSize.s:
+      return 's';
+    case DressSize.m:
+      return 'm';
+    case DressSize.l:
+      return 'l';
+    case DressSize.xl:
+      return 'xl';
+  }
+}
+
+List<Dress> _buildSizedDresses({
+  required String idPrefix,
+  required String title,
+  required String description,
+  required double price,
+  required String imageUrl,
+  required DressType type,
+}) {
+  return _sizes.map((size) {
+    return Dress(
+      id: '${idPrefix}_${_sizeCode(size)}',
+      title: title,
+      description: description,
+      price: price,
+      imageUrl: imageUrl,
+      category: DressCategory.men,
+      type: type,
+      size: size,
+    );
+  }).toList(growable: false);
+}
+
+final List<Dress> menDresses = [
+  ..._buildSizedDresses(
+    idPrefix: 'ps_1',
+    title: 'Formal White Shirt & Black Pant Pair',
+    description:
+    'Complete formal pant-shirt pair with a classic white dress shirt and slim-fit black pant. Perfect for office, interviews and formal events.',
+    price: 3800.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_1.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'ps_2',
+    title: 'Checkered Shirt & Navy Pant Pair',
+    description:
+    'Stylish casual pair with red and navy checkered shirt and matching navy pant. Best for smart-casual daily wear.',
+    price: 3400.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_2.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'ps_3',
+    title: 'Navy Polo Shirt & Khaki Pant Pair',
+    description:
+    'Comfortable pant-shirt pair with navy blue polo shirt and khaki pant. Good choice for casual outings and summer wear.',
+    price: 3200.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_3.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'ps_4',
+    title: 'Sky Blue Shirt & Charcoal Pant Pair',
+    description:
+    'Elegant pair with sky blue Oxford shirt and charcoal pant. Suitable for meetings, office use and semi-formal events.',
+    price: 3600.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_4.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'ps_5',
+    title: 'Olive Shirt & Beige Chino Pair',
+    description:
+    'Modern casual pair with olive green shirt and beige chino pant. Light, breathable and ideal for daily wear.',
+    price: 3350.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_5.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'ps_6',
+    title: 'Black Shirt & Grey Trouser Pair',
+    description:
+    'Premium pair with black shirt and grey trouser. A sharp outfit for dinners, functions and formal gatherings.',
+    price: 3900.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_6.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'ps_7',
+    title: 'Denim Shirt & Black Jeans Pair',
+    description:
+    'Trendy casual pair with denim shirt and black jeans. Best for college, outings and everyday fashion.',
+    price: 4100.0,
+    imageUrl: 'assets/images/men/pant_shirt/ps_7.png',
+    type: DressType.pantShirt,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_1',
+    title: 'Classic White Shalwar Qameez',
+    description:
+    'Traditional white cotton shalwar qameez, perfect for casual and formal wear. A wardrobe staple.',
+    price: 2500.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_1.png',
+    type: DressType.shalwarQameez,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_2',
+    title: 'Embroidered Blue Shalwar Qameez',
+    description:
+    'Premium embroidered royal-blue qameez with matching shalwar. Ideal for Eid celebrations and weddings.',
+    price: 4200.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_2.png',
+    type: DressType.shalwarQameez,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_3',
+    title: 'Grey Linen Shalwar Qameez',
+    description:
+    'Lightweight grey linen shalwar qameez — breathable and comfortable, perfect for hot Pakistani summers.',
+    price: 3200.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_3.png',
+    type: DressType.shalwarQameez,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_4',
+    title: 'Black Luxury Shalwar Qameez',
+    description:
+    'Rich black fabric with subtle silver thread work. Ideal for formal dinners, engagements and evening events.',
+    price: 5500.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_4.png',
+    type: DressType.shalwarQameez,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_5',
+    title: 'Mint Green Lawn Shalwar Qameez',
+    description:
+    'Fresh mint-green lawn fabric shalwar qameez. Light, airy and perfect for casual daytime outings.',
+    price: 2800.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_5.png',
+    type: DressType.shalwarQameez,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_6',
+    title: 'Maroon Khaddar Shalwar Qameez',
+    description:
+    'Warm maroon khaddar shalwar qameez — thick, cozy fabric ideal for winter months and chilly evenings.',
+    price: 3800.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_6.png',
+    type: DressType.shalwarQameez,
+  ),
+
+  ..._buildSizedDresses(
+    idPrefix: 'sq_7',
+    title: 'Beige Printed Shalwar Qameez',
+    description:
+    'Elegant beige shalwar qameez with subtle geometric print. Great for semi-formal family gatherings.',
+    price: 3500.0,
+    imageUrl: 'assets/images/men/shalwar_qameez/sq_7.png',
+    type: DressType.shalwarQameez,
+  ),
+];
+
+const Set<DressType> _allowedMenClothingTypes = {
+  DressType.pantShirt,
+  DressType.shalwarQameez,
+};
+
+bool _isMenClothing(Dress dress) {
+  return dress.category == DressCategory.men &&
+      _allowedMenClothingTypes.contains(dress.type);
+}
+
+final List<Dress> menClothesOnly = menDresses.where(_isMenClothing).toList(
+  growable: false,
+);

@@ -47,4 +47,5 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/models/movenet_thunder.tflite
+      - assets/images/men/pant_shirt/
+      - assets/images/men/shalwar_qameez/
