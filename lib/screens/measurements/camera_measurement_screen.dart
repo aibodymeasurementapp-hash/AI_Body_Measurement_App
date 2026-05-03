@@ -37,6 +37,7 @@ class _CameraMeasurementScreenState
   final GyroService _gyro = GyroService();
 
   bool _isDetectingPose = false;
+  bool _isConfirming = false;
 
   @override
   void initState() {
@@ -75,11 +76,15 @@ class _CameraMeasurementScreenState
 
       final file = File(image.path);
 
+      // ✅ Clear stale result before new image selection
+      ref.read(measurementStateProvider.notifier).clearResult();
+
       setState(() {
         _selectedImage = file;
         _capturedGyroFactor = 1.0;
         _capturedTiltInfo = 'gallery — no tilt data';
         _isDetectingPose = true;
+        _isConfirming = false;
       });
 
       await _getImageDimensions(file);
@@ -87,8 +92,8 @@ class _CameraMeasurementScreenState
       // Detect pose and wait for it to fully complete
       await ref.read(poseProvider.notifier).detectPose(file.path);
 
-      // ✅ Use addPostFrameCallback so Riverpod pose state
-      // is fully propagated before we re-evaluate validPose
+      // ✅ addPostFrameCallback ensures Riverpod pose state is fully
+      // propagated before we re-evaluate validPose
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -106,21 +111,27 @@ class _CameraMeasurementScreenState
 
   // ── Retake ─────────────────────────────────────────────────────────────
   void _retake() {
+    // ✅ Clear stale result on retake
+    ref.read(measurementStateProvider.notifier).clearResult();
+
     setState(() {
       _selectedImage = null;
       _imageSize = null;
       _capturedGyroFactor = 1.0;
       _capturedTiltInfo = '';
       _isDetectingPose = false;
+      _isConfirming = false;
     });
     ref.read(poseProvider.notifier).clearPose();
   }
 
   // ── Confirm ────────────────────────────────────────────────────────────
   Future<void> _confirm() async {
-    if (_selectedImage == null) return;
+    if (_selectedImage == null || _isConfirming) return;
 
+    // ✅ Read pose from Riverpod synchronously before any awaits
     final pose = ref.read(poseProvider);
+
     if (pose == null) {
       _showError("No pose detected. Please retake the photo.");
       return;
@@ -135,13 +146,37 @@ class _CameraMeasurementScreenState
     final userProfile = ref.read(appStateProvider).userProfile;
     final double height = userProfile?.heightCm ?? 170.0;
 
-    await ref.read(measurementStateProvider.notifier)
-        .processCameraMeasurements(
-      _selectedImage!.path,
-      height,
-      userProfile: userProfile,
-      gyroCorrectionFactor: _capturedGyroFactor,
-    );
+    // ✅ Lock confirm to prevent double-taps
+    setState(() => _isConfirming = true);
+
+    try {
+      // ✅ Clear stale result so state transition is always fresh
+      ref.read(measurementStateProvider.notifier).clearResult();
+
+      await ref.read(measurementStateProvider.notifier)
+          .processCameraMeasurements(
+        _selectedImage!.path,
+        height,
+        pose: pose,               // ✅ pass Riverpod pose directly
+        userProfile: userProfile,
+        gyroCorrectionFactor: _capturedGyroFactor,
+      );
+
+      if (!mounted) return;
+
+      // ✅ Navigate directly after await — reliable vs ref.listen alone
+      final result = ref.read(measurementStateProvider).result;
+      if (result != null) {
+        ref.read(appStateProvider.notifier).setLatestResult(result);
+        context.goNamed('result');
+      } else {
+        _showError("Processing failed. Please try again.");
+        setState(() => _isConfirming = false);
+      }
+    } catch (e) {
+      _showError("Something went wrong: $e");
+      if (mounted) setState(() => _isConfirming = false);
+    }
   }
 
   void _showError(String message) {
@@ -162,14 +197,19 @@ class _CameraMeasurementScreenState
 
     final bool validPose = validation.isValid;
 
-    // ✅ Only enable confirm when: not detecting, pose is valid, not already processing
-    final bool canConfirm =
-        !_isDetectingPose && validPose && !measurementState.isLoading;
+    // ✅ All four conditions must be true to enable confirm
+    final bool canConfirm = !_isDetectingPose &&
+        validPose &&
+        !_isConfirming &&
+        !measurementState.isLoading;
 
+    // ✅ ref.listen kept only as error fallback
     ref.listen(measurementStateProvider, (previous, next) {
-      if (next.result != null && !next.isLoading) {
-        ref.read(appStateProvider.notifier).setLatestResult(next.result!);
-        context.goNamed('result');
+      if (next.error != null && !next.isLoading && _isConfirming) {
+        if (mounted) {
+          _showError(next.error!);
+          setState(() => _isConfirming = false);
+        }
       }
     });
 
@@ -239,6 +279,19 @@ class _CameraMeasurementScreenState
                         Text("Detecting pose..."),
                       ],
                     )
+                  else if (_isConfirming || measurementState.isLoading)
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        SizedBox(width: 8),
+                        Text("Processing measurements..."),
+                      ],
+                    )
                   else
                     Text(
                       validPose
@@ -294,8 +347,10 @@ class _CameraMeasurementScreenState
                 children: [
                   Expanded(
                     child: OutlinedButton(
-                      // ✅ Disable retake while detecting or processing
-                      onPressed: (_isDetectingPose || measurementState.isLoading)
+                      // ✅ Disable retake while detecting, confirming, or processing
+                      onPressed: (_isDetectingPose ||
+                          _isConfirming ||
+                          measurementState.isLoading)
                           ? null
                           : _retake,
                       child: const Text("Retake"),
@@ -305,9 +360,8 @@ class _CameraMeasurementScreenState
                   Expanded(
                     child: PrimaryButton(
                       text: "Confirm",
-                      // ✅ Fixed: uses canConfirm which waits for pose state
                       onPressed: canConfirm ? _confirm : null,
-                      isLoading: measurementState.isLoading || _isDetectingPose,
+                      isLoading: _isConfirming || measurementState.isLoading,
                     ),
                   ),
                 ],

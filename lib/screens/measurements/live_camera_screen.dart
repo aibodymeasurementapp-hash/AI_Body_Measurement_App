@@ -32,7 +32,6 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
   Size?                 _previewSize;
   bool                  _showGuide         = true;
 
-  // ── NEW: single-flight lock that covers the full stop→snap→restart cycle ──
   bool _isTakingInferencePicture = false;
 
   // Gyro
@@ -44,7 +43,6 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
 
   final MlKitPoseService _poseService = MlKitPoseService();
 
-  // Throttle: minimum gap between inference snapshots
   static const _inferenceIntervalMs = 900;
   DateTime _lastInference = DateTime.fromMillisecondsSinceEpoch(0);
 
@@ -108,9 +106,7 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
         _previewSize = Size(camSize.height, camSize.width);
       });
 
-      // Reset inference lock on fresh init
       _isTakingInferencePicture = false;
-
       _controller!.startImageStream(_onFrame);
     } catch (e) {
       _showError("Camera init failed: $e");
@@ -119,40 +115,33 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
     }
   }
 
-  // ── Live frame processing ─────────────────────────────────────────────────
+  // ── Live frame processing ──────────────────────────────────────────────────
   Future<void> _onFrame(CameraImage frame) async {
-    // Guard: skip if any capture/inference is already in flight
     if (_isTakingInferencePicture || _isCapturing) return;
     if (_controller == null || !_controller!.value.isInitialized) return;
 
     final now = DateTime.now();
     if (now.difference(_lastInference).inMilliseconds < _inferenceIntervalMs) return;
 
-    // ── Acquire the lock BEFORE any await ──────────────────────────────────
     _isTakingInferencePicture = true;
     _lastInference = now;
 
     XFile? snap;
     try {
-      // 1. Stop stream safely
       if (_controller!.value.isStreamingImages) {
         await _controller!.stopImageStream();
       }
 
-      // 2. Double-check we're still in a good state after the await
       if (_controller == null || !_controller!.value.isInitialized || _isCapturing) {
-        return; // finally will clear the lock & restart if needed
+        return;
       }
 
-      // 3. Take the picture
       snap = await _controller!.takePicture();
 
-      // 4. Run ML Kit
       final Pose? pose = await _poseService.detectFromPath(snap.path);
 
       if (pose != null) {
         final validation = PoseValidationService.validate(pose);
-        PoseNotifier.lastPose = pose;
         if (mounted) {
           setState(() {
             _livePose       = pose;
@@ -163,15 +152,12 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
     } catch (e) {
       debugPrint("Inference frame error: $e");
     } finally {
-      // Clean up temp file
       if (snap != null) {
         try { await File(snap.path).delete(); } catch (_) {}
       }
 
-      // Release the lock
       _isTakingInferencePicture = false;
 
-      // Restart stream only if we're not in the middle of a real capture
       if (_controller != null &&
           _controller!.value.isInitialized &&
           !_isCapturing &&
@@ -185,12 +171,26 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
     }
   }
 
-  // ── Capture & measure ─────────────────────────────────────────────────────
+  // ── Capture & measure ──────────────────────────────────────────────────────
   Future<void> _captureAndMeasure() async {
     if (_isCapturing) return;
+
+    // ✅ Snapshot _livePose before any await — it's already detected & valid
+    final Pose? pose = _livePose;
+    if (pose == null) {
+      _showError("No pose detected. Please hold your position.");
+      return;
+    }
+
+    final validation = PoseValidationService.validate(pose);
+    if (!validation.isValid) {
+      _showError(validation.failureReason ?? "Invalid pose. Please adjust.");
+      return;
+    }
+
     setState(() => _isCapturing = true);
 
-    // Wait for any in-flight inference snap to finish before we proceed
+    // Wait for any in-flight inference to finish
     int safetyCounter = 0;
     while (_isTakingInferencePicture && safetyCounter < 20) {
       await Future.delayed(const Duration(milliseconds: 100));
@@ -202,7 +202,6 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
         await _controller!.stopImageStream();
       }
 
-      // Small settling delay so the camera is fully idle
       await Future.delayed(const Duration(milliseconds: 150));
 
       final XFile photo = await _controller!.takePicture();
@@ -214,27 +213,46 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
       debugPrint('[LiveCamera] capture gyro=${gyro.toStringAsFixed(3)} '
           'tilt=${_tiltDeg.toStringAsFixed(1)}°');
 
+      // ✅ Pass the already-detected pose directly — no static lookup
       await ref.read(measurementStateProvider.notifier)
           .processCameraMeasurements(
         photo.path,
         height,
+        pose:                pose,
         userProfile:          userProfile,
         gyroCorrectionFactor: gyro,
       );
+
+      if (!mounted) return;
+
+      // ✅ Navigate directly after await
+      final result = ref.read(measurementStateProvider).result;
+      if (result != null) {
+        ref.read(appStateProvider.notifier).setLatestResult(result);
+        context.goNamed('result');
+      } else {
+        _showError("Processing failed. Please try again.");
+        setState(() => _isCapturing = false);
+        _restartStream();
+      }
     } catch (e) {
       _showError("Capture failed: $e");
-      setState(() => _isCapturing = false);
-      // Restart inference stream on failure
-      if (_controller != null && _controller!.value.isInitialized &&
-          !_controller!.value.isStreamingImages) {
-        try { _controller!.startImageStream(_onFrame); } catch (_) {}
-      }
+      if (mounted) setState(() => _isCapturing = false);
+      _restartStream();
+    }
+  }
+
+  void _restartStream() {
+    if (_controller != null &&
+        _controller!.value.isInitialized &&
+        !_controller!.value.isStreamingImages) {
+      try { _controller!.startImageStream(_onFrame); } catch (_) {}
     }
   }
 
   // ── Camera teardown ───────────────────────────────────────────────────────
   Future<void> _stopCamera() async {
-    _isTakingInferencePicture = false; // release lock so no restarts fire
+    _isTakingInferencePicture = false;
     try {
       if (_controller != null && _controller!.value.isInitialized) {
         if (_controller!.value.isStreamingImages) {
@@ -275,18 +293,12 @@ class _LiveCameraScreenState extends ConsumerState<LiveCameraScreen>
     final bool validPose  = _liveValidation?.isValid ?? false;
     final bool canCapture = validPose && !_isCapturing;
 
+    // ✅ ref.listen kept only as error fallback — navigation handled in _captureAndMeasure
     ref.listen(measurementStateProvider, (previous, next) {
-      if (next.result != null && !next.isLoading) {
-        ref.read(appStateProvider.notifier).setLatestResult(next.result!);
-        context.goNamed('result');
-      }
-      if (next.error != null) {
+      if (next.error != null && !next.isLoading) {
         _showError(next.error!);
-        setState(() => _isCapturing = false);
-        if (_controller != null && _controller!.value.isInitialized &&
-            !_controller!.value.isStreamingImages) {
-          try { _controller!.startImageStream(_onFrame); } catch (_) {}
-        }
+        if (mounted) setState(() => _isCapturing = false);
+        _restartStream();
       }
     });
 

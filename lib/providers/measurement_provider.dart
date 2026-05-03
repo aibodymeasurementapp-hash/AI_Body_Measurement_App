@@ -39,9 +39,11 @@ class MeasurementStateNotifier extends StateNotifier<MeasurementState> {
     }
   }
 
+  // ✅ pose is now a required named parameter — forwarded to service
   Future<void> processCameraMeasurements(
       String imagePath,
       double userHeightCm, {
+        required Pose pose,
         UserProfile? userProfile,
         double gyroCorrectionFactor = 1.0,
       }) async {
@@ -50,7 +52,8 @@ class MeasurementStateNotifier extends StateNotifier<MeasurementState> {
       final result = await _measurementService.processCameraMeasurements(
         imagePath,
         userHeightCm,
-        userProfile:          userProfile,
+        pose:                pose,
+        userProfile:         userProfile,
         gyroCorrectionFactor: gyroCorrectionFactor,
       );
       state = MeasurementState.success(result);
@@ -78,6 +81,9 @@ class MeasurementStateNotifier extends StateNotifier<MeasurementState> {
       state = MeasurementState.error(e.toString());
     }
   }
+
+  // ✅ Clears stale result before new processing
+  void clearResult() => state = const MeasurementState.initial();
 
   void reset() => state = const MeasurementState.initial();
 }

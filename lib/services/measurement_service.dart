@@ -1,7 +1,6 @@
 import '../models/measurement.dart';
 import '../models/pose.dart';
 import '../models/user_profile.dart';
-import '../providers/pose_provider.dart';
 import 'measurement_calculator.dart';
 
 class MeasurementService {
@@ -31,19 +30,15 @@ class MeasurementService {
     );
   }
 
+  // ✅ pose is now passed in directly — no static lookup
   Future<MeasurementResult> processCameraMeasurements(
       String imagePath,
       double userHeightCm, {
+        required Pose pose,
         UserProfile? userProfile,
         double gyroCorrectionFactor = 1.0,
       }) async {
     await _simulateProcessing();
-
-    final Pose? pose = PoseNotifier.lastPose;
-
-    if (pose == null) {
-      throw Exception("Pose not detected. Please retake the photo.");
-    }
 
     if (!pose.hasValidKeypoints()) {
       throw Exception(
