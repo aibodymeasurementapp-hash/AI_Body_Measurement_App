@@ -77,10 +77,17 @@ packages:
     dependency: transitive
     description:
       name: characters
+<<<<<<< HEAD
       sha256: faf38497bda5ead2a8c7615f4f7939df04333478bf32e4173fcb06d428b5716b
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+=======
+      sha256: f71061c654a3380576a52b451dd5532377954cf9dbd272a78fc8479606670803
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   clock:
     dependency: transitive
     description:
@@ -137,6 +144,17 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+<<<<<<< HEAD
+=======
+  equatable:
+    dependency: transitive
+    description:
+      name: equatable
+      sha256: "3e0141505477fd8ad55d6eb4e7776d3fe8430be8e497ccb1521370c3f21a3e2b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.8"
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   fake_async:
     dependency: transitive
     description:
@@ -297,7 +315,11 @@ packages:
     source: hosted
     version: "0.12.1"
   http:
+<<<<<<< HEAD
     dependency: "direct main"
+=======
+    dependency: transitive
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
@@ -428,18 +450,32 @@ packages:
     dependency: transitive
     description:
       name: matcher
+<<<<<<< HEAD
       sha256: dc0b7dc7651697ea4ff3e69ef44b0407ea32c487a39fff6a4004fa585e901861
       url: "https://pub.dev"
     source: hosted
     version: "0.12.19"
+=======
+      sha256: dc58c723c3c24bf8d3e2d3ad3f2f9d7bd9cf43ec6feaa64181775e60190153f2
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.12.17"
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   material_color_utilities:
     dependency: transitive
     description:
       name: material_color_utilities
+<<<<<<< HEAD
       sha256: "9c337007e82b1889149c82ed242ed1cb24a66044e30979c44912381e9be4c48b"
       url: "https://pub.dev"
     source: hosted
     version: "0.13.0"
+=======
+      sha256: f7142bb1154231d7ea5f96bc7bde4bda2a0945d2806bb11670e30b850d56bdec
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.11.1"
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   meta:
     dependency: transitive
     description:
@@ -488,6 +524,25 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
+<<<<<<< HEAD
+=======
+  purchases_flutter:
+    dependency: "direct main"
+    description:
+      name: purchases_flutter
+      sha256: "7608be2dc1f48cf34f15cc5830af256b89d2d7966d5da63788a87a7a8925ff87"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.16.1"
+  purchases_ui_flutter:
+    dependency: "direct main"
+    description:
+      name: purchases_ui_flutter
+      sha256: f630597686ea55c832482799cedbb863e143070f30352cfc064db58d687cc8eb
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.16.1"
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   riverpod:
     dependency: transitive
     description:
@@ -577,10 +632,17 @@ packages:
     dependency: transitive
     description:
       name: test_api
+<<<<<<< HEAD
       sha256: "8161c84903fd860b26bfdefb7963b3f0b68fee7adea0f59ef805ecca346f0c7a"
       url: "https://pub.dev"
     source: hosted
     version: "0.7.10"
+=======
+      sha256: ab2726c1a94d3176a45960b6234466ec367179b87dd74f1611adb1f3b5fb9d55
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.7"
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   typed_data:
     dependency: transitive
     description:

@@ -18,6 +18,10 @@ import '../screens/payment/payment_success_screen.dart';
 import '../screens/measurements/measurement_history_screen.dart';
 import '../screens/recommendations/dress_detail_screen.dart';
 
+<<<<<<< HEAD
+=======
+// ✅ Fix: Dress model must be imported so router.dart can cast state.extra
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 import '../models/dress.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -81,19 +85,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RecommendedDressesScreen(),
       ),
 
+<<<<<<< HEAD
+=======
+      // Optional teaser screen.
+      // It should only show features and send user to /payment.
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       GoRoute(
         path: '/plans',
         name: 'plans',
         builder: (context, state) => const PlanScreen(),
       ),
 
+<<<<<<< HEAD
+=======
+      // RevenueCat paywall screen.
+      // Monthly, yearly, and one-time lifetime plans are handled by RevenueCat.
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       GoRoute(
         path: '/payment',
         name: 'payment',
         builder: (context, state) => const PaymentScreen(),
       ),
 
+<<<<<<< HEAD
       // ✅ extra carries { chargeId, receiptUrl } from PaymentScreen
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       GoRoute(
         path: '/payment-success',
         name: 'payment-success',
@@ -106,6 +123,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const MeasurementHistoryScreen(),
       ),
 
+<<<<<<< HEAD
+=======
+      // ✅ Dress detail route — receives Dress object via state.extra
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       GoRoute(
         path: '/dress-detail',
         name: 'dress-detail',

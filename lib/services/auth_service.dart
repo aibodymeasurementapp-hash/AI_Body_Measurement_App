@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_profile.dart';
+<<<<<<< HEAD
 // RevenueCat removed — no payment imports needed in auth service
+=======
+import 'revenuecat_service.dart'; // ← single import, removed duplicate firebase_auth
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -14,6 +18,12 @@ class AuthService {
     );
     final uid = credential.user!.uid;
 
+<<<<<<< HEAD
+=======
+    // ✅ Tie RevenueCat identity to Firebase UID after login
+    await RevenueCatService.loginUser(uid);
+
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     // Fetch profile from Firestore
     final doc = await _firestore.collection('users').doc(uid).get();
     return UserProfile.fromMap(doc.data()!, uid);
@@ -26,6 +36,10 @@ class AuthService {
     );
     final uid = credential.user!.uid;
 
+<<<<<<< HEAD
+=======
+    // Save profile to Firestore
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     final profileWithId = UserProfile(
       id: uid,
       fullName: userProfile.fullName,
@@ -39,10 +53,21 @@ class AuthService {
 
     await _firestore.collection('users').doc(uid).set(profileWithId.toMap());
 
+<<<<<<< HEAD
+=======
+    // ✅ Tie RevenueCat identity to Firebase UID after registration
+    await RevenueCatService.loginUser(uid);
+
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     return profileWithId;
   }
 
   Future<void> logout() async {
+<<<<<<< HEAD
+=======
+    // ✅ Clear RevenueCat identity BEFORE Firebase sign-out
+    await RevenueCatService.logoutUser();
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     await _auth.signOut();
   }
 }

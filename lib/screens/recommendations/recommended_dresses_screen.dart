@@ -8,6 +8,7 @@ import '../../data/men_dresses.dart';
 import '../../services/size_recommendation_service.dart';
 import '../../providers/app_state_provider.dart';
 
+<<<<<<< HEAD
 class RecommendedDressesScreen extends ConsumerStatefulWidget {
   final DressType? selectedType;
 
@@ -43,6 +44,15 @@ class _RecommendedDressesScreenState
     switch (_selectedType) {
       case DressType.pantShirt:
         return 'Pant Shirt Pair Picks';
+=======
+class RecommendedDressesScreen extends ConsumerWidget {
+  const RecommendedDressesScreen({super.key});
+
+  String _screenTitle(DressType? type) {
+    switch (type) {
+      case DressType.pantShirt:
+        return 'Pant Shirt Picks';
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       case DressType.shalwarQameez:
         return 'Shalwar Qameez Picks';
       default:
@@ -50,8 +60,13 @@ class _RecommendedDressesScreenState
     }
   }
 
+<<<<<<< HEAD
   String get _typeLabel {
     switch (_selectedType) {
+=======
+  String _typeLabel(DressType? type) {
+    switch (type) {
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       case DressType.pantShirt:
         return 'Pant Shirt Pairs';
       case DressType.shalwarQameez:
@@ -62,13 +77,24 @@ class _RecommendedDressesScreenState
   }
 
   @override
+<<<<<<< HEAD
   Widget build(BuildContext context) {
     final measurement = ref.watch(appStateProvider).latestResult;
+=======
+  Widget build(BuildContext context, WidgetRef ref) {
+    final appState     = ref.watch(appStateProvider);
+    final measurement  = appState.latestResult;
+    final selectedType = appState.selectedDressType; // set by DressTypeScreen
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
     if (measurement == null) {
       return Scaffold(
         backgroundColor: AppColors.background,
+<<<<<<< HEAD
         appBar: _buildAppBar(),
+=======
+        appBar: _buildAppBar(context, selectedType),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         body: const _NoMeasurementState(),
       );
     }
@@ -81,6 +107,7 @@ class _RecommendedDressesScreenState
       menClothesOnly,
     );
 
+<<<<<<< HEAD
     final filtered = _selectedType == null
         ? allForSize
         : allForSize.where((dress) => dress.type == _selectedType).toList();
@@ -88,11 +115,22 @@ class _RecommendedDressesScreenState
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: _buildAppBar(),
+=======
+    // Always filter by the dress type the user selected in DressTypeScreen
+    final filtered = selectedType == null
+        ? allForSize
+        : allForSize.where((d) => d.type == selectedType).toList();
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: _buildAppBar(context, selectedType),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SizeBanner(
             sizeLabel: recommendedSize.name.toUpperCase(),
+<<<<<<< HEAD
             chestCm: measurement.chest,
             typeLabel: _typeLabel,
           ),
@@ -129,6 +167,10 @@ class _RecommendedDressesScreenState
                 ],
               ),
             ),
+=======
+            chestCm:   measurement.chest,
+            typeLabel: _typeLabel(selectedType),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
           ),
 
           const SizedBox(height: 8),
@@ -140,8 +182,13 @@ class _RecommendedDressesScreenState
             child: Text(
               '${filtered.length} clothing item${filtered.length == 1 ? '' : 's'} found',
               style: const TextStyle(
+<<<<<<< HEAD
                 color: AppColors.textSecondary,
                 fontSize: 13,
+=======
+                color:      AppColors.textSecondary,
+                fontSize:   13,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -161,9 +208,15 @@ class _RecommendedDressesScreenState
               ),
               gridDelegate:
               const SliverGridDelegateWithFixedCrossAxisCount(
+<<<<<<< HEAD
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
+=======
+                crossAxisCount:  2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing:  12,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                 childAspectRatio: 0.60,
               ),
               itemCount: filtered.length,
@@ -178,10 +231,17 @@ class _RecommendedDressesScreenState
     );
   }
 
+<<<<<<< HEAD
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
+=======
+  AppBar _buildAppBar(BuildContext context, DressType? selectedType) {
+    return AppBar(
+      backgroundColor:        AppColors.background,
+      elevation:              0,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       scrolledUnderElevation: 0,
       leading: IconButton(
         icon: const Icon(
@@ -193,11 +253,19 @@ class _RecommendedDressesScreenState
         context.canPop() ? context.pop() : context.goNamed('result'),
       ),
       title: Text(
+<<<<<<< HEAD
         _screenTitle,
         style: const TextStyle(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.bold,
           fontSize: 20,
+=======
+        _screenTitle(selectedType),
+        style: const TextStyle(
+          color:      AppColors.textPrimary,
+          fontWeight: FontWeight.bold,
+          fontSize:   20,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         ),
       ),
     );
@@ -218,7 +286,11 @@ class _NoMeasurementState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
+<<<<<<< HEAD
             width: 80,
+=======
+            width:  80,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             height: 80,
             decoration: BoxDecoration(
               color: AppColors.primaryLight.withOpacity(0.3),
@@ -227,16 +299,26 @@ class _NoMeasurementState extends StatelessWidget {
             child: const Icon(
               Icons.straighten,
               color: AppColors.primary,
+<<<<<<< HEAD
               size: 40,
+=======
+              size:  40,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             ),
           ),
           const SizedBox(height: 20),
           const Text(
             'No measurements found.',
             style: TextStyle(
+<<<<<<< HEAD
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: AppColors.textPrimary,
+=======
+              fontSize:   18,
+              fontWeight: FontWeight.bold,
+              color:      AppColors.textPrimary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             ),
           ),
           const SizedBox(height: 8),
@@ -244,7 +326,11 @@ class _NoMeasurementState extends StatelessWidget {
             'Please take measurements first.',
             style: TextStyle(
               fontSize: 14,
+<<<<<<< HEAD
               color: AppColors.textSecondary,
+=======
+              color:    AppColors.textSecondary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             ),
           ),
         ],
@@ -285,7 +371,11 @@ class _SizeBanner extends StatelessWidget {
             AppColors.primaryLight.withOpacity(0.08),
           ],
           begin: Alignment.topLeft,
+<<<<<<< HEAD
           end: Alignment.bottomRight,
+=======
+          end:   Alignment.bottomRight,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         ),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
         border: Border.all(
@@ -298,6 +388,7 @@ class _SizeBanner extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
+<<<<<<< HEAD
               vertical: 10,
             ),
             decoration: BoxDecoration(
@@ -308,15 +399,33 @@ class _SizeBanner extends StatelessWidget {
                   color: AppColors.primary.withOpacity(0.35),
                   blurRadius: 8,
                   offset: const Offset(0, 3),
+=======
+              vertical:   10,
+            ),
+            decoration: BoxDecoration(
+              color:        AppColors.primary,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMedium),
+              boxShadow: [
+                BoxShadow(
+                  color:      AppColors.primary.withOpacity(0.35),
+                  blurRadius: 8,
+                  offset:     const Offset(0, 3),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                 ),
               ],
             ),
             child: Text(
               'Size $sizeLabel',
               style: const TextStyle(
+<<<<<<< HEAD
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
+=======
+                color:       Colors.white,
+                fontWeight:  FontWeight.bold,
+                fontSize:    16,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                 letterSpacing: 0.5,
               ),
             ),
@@ -332,15 +441,24 @@ class _SizeBanner extends StatelessWidget {
                   typeLabel,
                   style: const TextStyle(
                     fontSize: 12,
+<<<<<<< HEAD
                     color: AppColors.textSecondary,
+=======
+                    color:    AppColors.textSecondary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Chest: ${chestCm.toStringAsFixed(1)} cm',
                   style: const TextStyle(
+<<<<<<< HEAD
                     fontSize: 14,
                     color: AppColors.textPrimary,
+=======
+                    fontSize:   14,
+                    color:      AppColors.textPrimary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -349,7 +467,11 @@ class _SizeBanner extends StatelessWidget {
           ),
 
           Container(
+<<<<<<< HEAD
             width: 36,
+=======
+            width:  36,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             height: 36,
             decoration: BoxDecoration(
               color: AppColors.success.withOpacity(0.12),
@@ -358,7 +480,11 @@ class _SizeBanner extends StatelessWidget {
             child: const Icon(
               Icons.check_circle_outline,
               color: AppColors.success,
+<<<<<<< HEAD
               size: 20,
+=======
+              size:  20,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             ),
           ),
         ],
@@ -368,6 +494,7 @@ class _SizeBanner extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+<<<<<<< HEAD
 // Filter chip
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -420,6 +547,8 @@ class _FilterChip extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 // Empty state
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -428,6 +557,7 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return const Center(
       child: Text(
         'No clothes found.',
@@ -435,13 +565,54 @@ class _EmptyState extends StatelessWidget {
           color: AppColors.textSecondary,
           fontSize: 15,
         ),
+=======
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width:  80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppColors.primaryLight.withOpacity(0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.checkroom_outlined,
+              color: AppColors.textSecondary,
+              size:  40,
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'No clothes found.',
+            style: TextStyle(
+              fontSize:   16,
+              fontWeight: FontWeight.w600,
+              color:      AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            'No items match your selected dress type.',
+            style: TextStyle(
+              fontSize: 13,
+              color:    AppColors.textSecondary,
+            ),
+          ),
+        ],
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       ),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+<<<<<<< HEAD
 // Dress card  ← UPDATED: GestureDetector + Hero added
+=======
+// Dress card
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _DressCard extends StatelessWidget {
@@ -451,11 +622,15 @@ class _DressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     // ✅ GestureDetector wraps the whole card for tap navigation
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     return GestureDetector(
       onTap: () => context.goNamed('dress-detail', extra: dress),
       child: Container(
         decoration: BoxDecoration(
+<<<<<<< HEAD
           color: Colors.white,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
           boxShadow: [
@@ -463,6 +638,15 @@ class _DressCard extends StatelessWidget {
               color: AppColors.primary.withOpacity(0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
+=======
+          color:        Colors.white,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
+          boxShadow: [
+            BoxShadow(
+              color:      AppColors.primary.withOpacity(0.08),
+              blurRadius: 12,
+              offset:     const Offset(0, 4),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
             ),
           ],
         ),
@@ -477,40 +661,66 @@ class _DressCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
+<<<<<<< HEAD
                     // ✅ Hero tag links this image to dress_detail_screen
                     //    for the smooth shared-element transition
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                     Hero(
                       tag: 'dress_image_${dress.id}',
                       child: _DressImage(imagePath: dress.imageUrl),
                     ),
 
                     Positioned(
+<<<<<<< HEAD
                       top: 8,
+=======
+                      top:  8,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                       left: 8,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
+<<<<<<< HEAD
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
+=======
+                          vertical:   4,
+                        ),
+                        decoration: BoxDecoration(
+                          color:        AppColors.primary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusSmall,
                           ),
                           boxShadow: [
                             BoxShadow(
+<<<<<<< HEAD
                               color: AppColors.primary.withOpacity(0.4),
                               blurRadius: 6,
                               offset: const Offset(0, 2),
+=======
+                              color:      AppColors.primary.withOpacity(0.4),
+                              blurRadius: 6,
+                              offset:     const Offset(0, 2),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                             ),
                           ],
                         ),
                         child: Text(
                           'Size ${dress.sizeLabel}',
                           style: const TextStyle(
+<<<<<<< HEAD
                             fontSize: 10,
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
+=======
+                            fontSize:    10,
+                            color:       Colors.white,
+                            fontWeight:  FontWeight.bold,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                             letterSpacing: 0.3,
                           ),
                         ),
@@ -529,10 +739,17 @@ class _DressCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,
+<<<<<<< HEAD
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primaryLight.withOpacity(0.25),
+=======
+                      vertical:   2,
+                    ),
+                    decoration: BoxDecoration(
+                      color:        AppColors.primaryLight.withOpacity(0.25),
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -540,8 +757,13 @@ class _DressCard extends StatelessWidget {
                           ? 'Pant Shirt Pair'
                           : dress.typeLabel,
                       style: const TextStyle(
+<<<<<<< HEAD
                         fontSize: 10,
                         color: AppColors.primaryDark,
+=======
+                        fontSize:   10,
+                        color:      AppColors.primaryDark,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -554,10 +776,17 @@ class _DressCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
+<<<<<<< HEAD
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
                       height: 1.3,
+=======
+                      fontSize:   12,
+                      fontWeight: FontWeight.w700,
+                      color:      AppColors.textPrimary,
+                      height:     1.3,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                     ),
                   ),
 
@@ -566,9 +795,15 @@ class _DressCard extends StatelessWidget {
                   Text(
                     dress.priceLabel,
                     style: const TextStyle(
+<<<<<<< HEAD
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
+=======
+                      fontSize:   13,
+                      fontWeight: FontWeight.bold,
+                      color:      AppColors.primary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                     ),
                   ),
                 ],
@@ -597,14 +832,22 @@ class _DressImage extends StatelessWidget {
     if (isAssetImage) {
       return Image.asset(
         imagePath,
+<<<<<<< HEAD
         fit: BoxFit.cover,
+=======
+        fit:          BoxFit.cover,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         errorBuilder: (_, __, ___) => _imageFallback(),
       );
     }
 
     return Image.network(
       imagePath,
+<<<<<<< HEAD
       fit: BoxFit.cover,
+=======
+      fit:          BoxFit.cover,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       errorBuilder: (_, __, ___) => _imageFallback(),
       loadingBuilder: (_, child, progress) {
         if (progress == null) return child;
@@ -612,7 +855,11 @@ class _DressImage extends StatelessWidget {
           color: AppColors.secondary.withOpacity(0.2),
           child: const Center(
             child: CircularProgressIndicator(
+<<<<<<< HEAD
               color: AppColors.primary,
+=======
+              color:       AppColors.primary,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
               strokeWidth: 2,
             ),
           ),
@@ -627,7 +874,11 @@ class _DressImage extends StatelessWidget {
       child: const Icon(
         Icons.checkroom_rounded,
         color: AppColors.textSecondary,
+<<<<<<< HEAD
         size: 40,
+=======
+        size:  40,
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       ),
     );
   }

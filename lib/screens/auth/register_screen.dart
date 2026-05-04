@@ -8,7 +8,11 @@ import '../../widgets/custom_app_bar.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/user_profile.dart';
 import '../../providers/app_state_provider.dart';
+<<<<<<< HEAD
 // RevenueCat removed
+=======
+import '../../services/revenuecat_service.dart'; // ← add this
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -20,6 +24,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
+<<<<<<< HEAD
   final _fullNameController        = TextEditingController();
   final _emailController           = TextEditingController();
   final _phoneController           = TextEditingController();
@@ -30,15 +35,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Gender _selectedGender = Gender.male;
   double _heightCm = 170.0;
   int    _age      = 25;
+=======
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  final _weightController = TextEditingController();
+
+  Gender _selectedGender = Gender.male;
+  double _heightCm = 170.0;
+  int _age = 25;
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
   @override
   void initState() {
     super.initState();
 
+<<<<<<< HEAD
     // After successful register → navigate directly (payment gate is in camera screen)
     ref.listenManual(authStateProvider, (previous, next) {
       if (next.isAuthenticated && !next.isLoading) {
         ref.read(appStateProvider.notifier).setUserProfile(next.user!);
+=======
+    // ✅ After successful register → show paywall if not premium, then navigate
+    ref.listenManual(authStateProvider, (previous, next) async {
+      if (next.isAuthenticated && !next.isLoading) {
+        ref.read(appStateProvider.notifier).setUserProfile(next.user!);
+
+        // New users will never be premium — paywall will always show here.
+        // They can purchase or dismiss and continue.
+        await RevenueCatService.presentPaywallIfNeeded(context);
+
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         if (context.mounted) context.goNamed('category');
       }
     });
@@ -75,10 +104,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     }
   }
 
+<<<<<<< HEAD
   void _incHeight() { if (_heightCm < 220) setState(() => _heightCm++); }
   void _decHeight() { if (_heightCm > 100) setState(() => _heightCm--); }
   void _incAge()    { if (_age < 80)       setState(() => _age++); }
   void _decAge()    { if (_age > 10)       setState(() => _age--); }
+=======
+  void _incHeight() {
+    if (_heightCm < 220) setState(() => _heightCm++);
+  }
+
+  void _decHeight() {
+    if (_heightCm > 100) setState(() => _heightCm--);
+  }
+
+  void _incAge() {
+    if (_age < 80) setState(() => _age++);
+  }
+
+  void _decAge() {
+    if (_age > 10) setState(() => _age--);
+  }
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
   @override
   Widget build(BuildContext context) {

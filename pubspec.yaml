@@ -33,7 +33,12 @@ dependencies:
   cloud_firestore: ^6.3.0
   #provider: ^6.1.2
   #uuid: ^4.3.3
+<<<<<<< HEAD
   http: ^1.2.0
+=======
+  purchases_flutter: ^9.8.0       # ← must be 9.8.0+ for test_ key to work
+  purchases_ui_flutter: ^9.8.0    # ← must match purchases_flutter version
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
 
 

@@ -76,6 +76,10 @@ class _CameraMeasurementScreenState
 
       final file = File(image.path);
 
+<<<<<<< HEAD
+=======
+      // ✅ Clear stale result before new image selection
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       ref.read(measurementStateProvider.notifier).clearResult();
 
       setState(() {
@@ -87,8 +91,17 @@ class _CameraMeasurementScreenState
       });
 
       await _getImageDimensions(file);
+<<<<<<< HEAD
       await ref.read(poseProvider.notifier).detectPose(file.path);
 
+=======
+
+      // Detect pose and wait for it to fully complete
+      await ref.read(poseProvider.notifier).detectPose(file.path);
+
+      // ✅ addPostFrameCallback ensures Riverpod pose state is fully
+      // propagated before we re-evaluate validPose
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       if (mounted) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -106,6 +119,10 @@ class _CameraMeasurementScreenState
 
   // ── Retake ─────────────────────────────────────────────────────────────
   void _retake() {
+<<<<<<< HEAD
+=======
+    // ✅ Clear stale result on retake
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     ref.read(measurementStateProvider.notifier).clearResult();
 
     setState(() {
@@ -144,19 +161,31 @@ class _CameraMeasurementScreenState
     setState(() => _isConfirming = true);
 
     try {
+<<<<<<< HEAD
+=======
+      // ✅ Clear stale result so state transition is always fresh
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       ref.read(measurementStateProvider.notifier).clearResult();
 
       await ref.read(measurementStateProvider.notifier)
           .processCameraMeasurements(
         _selectedImage!.path,
         height,
+<<<<<<< HEAD
         pose: pose,
+=======
+        pose: pose,               // ✅ pass Riverpod pose directly
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         userProfile: userProfile,
         gyroCorrectionFactor: _capturedGyroFactor,
       );
 
       if (!mounted) return;
 
+<<<<<<< HEAD
+=======
+      // ✅ Navigate directly after await — reliable vs ref.listen alone
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
       final result = ref.read(measurementStateProvider).result;
       if (result != null) {
         ref.read(appStateProvider.notifier).setLatestResult(result);
@@ -189,11 +218,19 @@ class _CameraMeasurementScreenState
 
     final bool validPose = validation.isValid;
 
+<<<<<<< HEAD
+=======
+    // ✅ All four conditions must be true to enable confirm
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     final bool canConfirm = !_isDetectingPose &&
         validPose &&
         !_isConfirming &&
         !measurementState.isLoading;
 
+<<<<<<< HEAD
+=======
+    // ✅ ref.listen kept only as error fallback
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
     ref.listen(measurementStateProvider, (previous, next) {
       if (next.error != null && !next.isLoading && _isConfirming) {
         if (mounted) {
@@ -337,6 +374,10 @@ class _CameraMeasurementScreenState
                 children: [
                   Expanded(
                     child: OutlinedButton(
+<<<<<<< HEAD
+=======
+                      // ✅ Disable retake while detecting, confirming, or processing
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
                       onPressed: (_isDetectingPose ||
                           _isConfirming ||
                           measurementState.isLoading)

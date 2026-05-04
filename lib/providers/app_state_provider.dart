@@ -39,6 +39,7 @@ class AppStateNotifier extends StateNotifier<AppState> {
     );
   }
 
+<<<<<<< HEAD
   // ← NEW
   void setPremium(bool value) {
     state = state.copyWith(isPremium: value);
@@ -48,3 +49,9 @@ class AppStateNotifier extends StateNotifier<AppState> {
     state = AppState();
   }
 }
+=======
+  void clearState() {
+    state = AppState();
+  }
+}
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89

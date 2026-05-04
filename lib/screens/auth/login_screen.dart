@@ -6,7 +6,11 @@ import '../../widgets/primary_button.dart';
 import '../../widgets/app_text_field.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/app_state_provider.dart';
+<<<<<<< HEAD
 // RevenueCat removed
+=======
+import '../../services/revenuecat_service.dart'; // ← add this
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -40,10 +44,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
 
+<<<<<<< HEAD
     // After successful login → navigate directly (payment gate is in camera screen)
     ref.listen(authStateProvider, (previous, next) {
       if (next.isAuthenticated && !next.isLoading) {
         ref.read(appStateProvider.notifier).setUserProfile(next.user!);
+=======
+    // ✅ After successful login → show paywall if not premium, then navigate
+    ref.listen(authStateProvider, (previous, next) async {
+      if (next.isAuthenticated && !next.isLoading) {
+        ref.read(appStateProvider.notifier).setUserProfile(next.user!);
+
+        // Show paywall only if user is not already premium.
+        // If premium → nothing shows and returns false.
+        // If not premium → paywall appears; user can buy or dismiss.
+        await RevenueCatService.presentPaywallIfNeeded(context);
+
+        // Navigate regardless — paywall is a soft gate here.
+        // If you want hard gate (must buy to proceed), check the result:
+        // final purchased = await RevenueCatService.presentPaywallIfNeeded(context);
+        // if (purchased || await RevenueCatService.isPremium()) { ... }
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
         if (context.mounted) context.goNamed('category');
       }
     });

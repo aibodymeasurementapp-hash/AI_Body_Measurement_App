@@ -9,7 +9,10 @@ class AppState {
   final Measurement? currentMeasurement;
   final MeasurementResult? latestResult;
   final List<MeasurementResult> savedResults;
+<<<<<<< HEAD
   final bool isPremium; // ← NEW
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
 
   AppState({
     this.userProfile,
@@ -18,7 +21,10 @@ class AppState {
     this.currentMeasurement,
     this.latestResult,
     this.savedResults = const [],
+<<<<<<< HEAD
     this.isPremium = false, // ← NEW
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   });
 
   AppState copyWith({
@@ -28,7 +34,10 @@ class AppState {
     Measurement? currentMeasurement,
     MeasurementResult? latestResult,
     List<MeasurementResult>? savedResults,
+<<<<<<< HEAD
     bool? isPremium, // ← NEW
+=======
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
   }) {
     return AppState(
       userProfile: userProfile ?? this.userProfile,
@@ -37,7 +46,13 @@ class AppState {
       currentMeasurement: currentMeasurement ?? this.currentMeasurement,
       latestResult: latestResult ?? this.latestResult,
       savedResults: savedResults ?? this.savedResults,
+<<<<<<< HEAD
       isPremium: isPremium ?? this.isPremium, // ← NEW
     );
   }
 }
+=======
+    );
+  }
+}
+>>>>>>> 545a1120d8ac65c628454bf89699a4ff8fd55a89
